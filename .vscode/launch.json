@@ -48,7 +48,8 @@
             "name": "flutter_askit",
             "cwd": "gdsc\\flutter_askit",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "program": "lib/main.dart"
         },
         {
             "name": "flutter_askit (profile mode)",

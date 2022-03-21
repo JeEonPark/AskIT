@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'main.dart';
+import 'package:ask_it/main.dart';
+
 //전역변수
 int pageSelected = 1;
 
@@ -65,7 +68,6 @@ Future<Map> getDocument() async {
         .get();
     map[lists[i]] = documentData.data();
   }
-
   // print(DateFormat('yyyy.MM.dd')
   //     .format(map.values.elementAt(0)?['date'].toDate()));
   if (pageSelected == 2) {
@@ -89,6 +91,7 @@ class _AskPageState extends State<AskPage> {
 
   @override
   Widget build(BuildContext context) {
+    BuildContext contextGlobal = context;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -122,14 +125,18 @@ class _AskPageState extends State<AskPage> {
                         child: Container(
                           child: Row(
                             children: [
+                              //검색버튼
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/route_button');
+                                },
                                 iconSize: 35,
                                 icon: const Icon(
                                   Icons.search_rounded,
                                   color: Colors.white,
                                 ),
                               ),
+                              //설정버튼
                               IconButton(
                                 onPressed: () async {
                                   Navigator.pop(context);
@@ -288,6 +295,8 @@ class _AskPageState extends State<AskPage> {
                                                   if (i == 0)
                                                     SizedBox(height: 5),
                                                   first(
+                                                      snapshot.data.keys
+                                                          .elementAt(i),
                                                       snapshot.data.values
                                                           .elementAt(
                                                               i)?['title'],
@@ -297,12 +306,9 @@ class _AskPageState extends State<AskPage> {
                                                       snapshot.data.values
                                                           .elementAt(
                                                               i)?['author'],
-                                                      DateFormat('yyyy.MM.dd')
-                                                          .format(snapshot
-                                                              .data.values
-                                                              .elementAt(
-                                                                  i)?['date']
-                                                              .toDate())),
+                                                      snapshot.data.values
+                                                          .elementAt(i)?['date']
+                                                          .toDate()),
                                                   if (i ==
                                                       snapshot.data.length - 1)
                                                     SizedBox(height: 5),
@@ -311,6 +317,8 @@ class _AskPageState extends State<AskPage> {
                                             : Column(
                                                 children: [
                                                   second(
+                                                      snapshot.data.keys
+                                                          .elementAt(i),
                                                       snapshot.data.values
                                                           .elementAt(
                                                               i)?['title'],
@@ -320,12 +328,9 @@ class _AskPageState extends State<AskPage> {
                                                       snapshot.data.values
                                                           .elementAt(
                                                               i)?['author'],
-                                                      DateFormat('yyyy.MM.dd')
-                                                          .format(snapshot
-                                                              .data.values
-                                                              .elementAt(
-                                                                  i)?['date']
-                                                              .toDate())),
+                                                      snapshot.data.values
+                                                          .elementAt(i)?['date']
+                                                          .toDate()),
                                                   if (i ==
                                                       snapshot.data.length - 1)
                                                     SizedBox(height: 5),
@@ -396,7 +401,11 @@ class _AskPageState extends State<AskPage> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
                   label: ('Favourite'),
-                )
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.favorite),
+                  label: ('Favourite'),
+                ),
               ],
             ),
           ),
@@ -406,134 +415,33 @@ class _AskPageState extends State<AskPage> {
   }
 }
 
-Widget first(String title, String texts, String author, String date) {
-  return Container(
-    height: 150,
-    margin: EdgeInsets.fromLTRB(8, 5, 8, 5),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(20),
-      color: Color.fromARGB(255, 89, 47, 178),
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        stops: [0, 0.35, 1],
-        colors: [
-          Color.fromARGB(255, 91, 50, 180),
-          Color.fromARGB(255, 88, 55, 165),
-          Color.fromARGB(255, 49, 27, 96)
-        ],
+Widget first(
+    String docId, String title, String texts, String author, DateTime date) {
+  return GestureDetector(
+    onTap: () {
+      gotoQuestionViewPage(docId, title, texts, author, date);
+    },
+    child: Container(
+      height: 150,
+      margin: EdgeInsets.fromLTRB(8, 5, 8, 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Color.fromARGB(255, 89, 47, 178),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: [0, 0.35, 1],
+          colors: [
+            Color.fromARGB(255, 91, 50, 180),
+            Color.fromARGB(255, 88, 55, 165),
+            Color.fromARGB(255, 49, 27, 96)
+          ],
+        ),
       ),
-    ),
-    child: Column(
-      children: [
-        Container(
-          //width = MediaQuery.of(context).size.width * 0.8,
-          padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
-          alignment: Alignment.bottomLeft,
-          height: 43,
-          child: RichText(
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            text: TextSpan(
-              text: title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontFamily: 'Montserrat',
-                fontWeight: FontWeight.w600,
-                fontSize: 20,
-              ),
-            ),
-          ),
-        ),
-        FractionallySizedBox(
-          widthFactor: 1,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(15, 5, 15, 0),
-            alignment: Alignment.topLeft,
-            width: 100,
-            height: 60,
-            child: RichText(
-              overflow: TextOverflow.ellipsis,
-              maxLines: 3,
-              text: TextSpan(
-                text: texts,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Montserrat',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-          ),
-        ),
-        FractionallySizedBox(
-          widthFactor: 1,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(15, 5, 5, 0),
-            width: 100,
-            height: 35,
-            child: Row(
-              children: [
-                Text(
-                  author,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  date,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                  ),
-                ),
-                IconButton(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.thumb_up_alt_outlined,
-                    color: Colors.white,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget second(String title, String texts, String author, String date) {
-  return Container(
-    height: 150,
-    margin: EdgeInsets.fromLTRB(8, 5, 8, 5),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(20),
-      color: Color.fromARGB(255, 89, 47, 178),
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        stops: [0, 0.35, 1],
-        colors: [
-          Color.fromARGB(255, 162, 61, 209),
-          Color.fromARGB(255, 148, 66, 205),
-          Color.fromARGB(255, 54, 27, 99)
-        ],
-      ),
-    ),
-    child: Column(
-      children: [
-        FractionallySizedBox(
-          widthFactor: 1,
-          child: Container(
+      child: Column(
+        children: [
+          Container(
+            //width = MediaQuery.of(context).size.width * 0.8,
             padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
             alignment: Alignment.bottomLeft,
             height: 43,
@@ -551,69 +459,197 @@ Widget second(String title, String texts, String author, String date) {
               ),
             ),
           ),
-        ),
-        FractionallySizedBox(
-          widthFactor: 1,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(15, 5, 15, 0),
-            alignment: Alignment.topLeft,
-            width: 100,
-            height: 60,
-            child: RichText(
-              overflow: TextOverflow.ellipsis,
-              maxLines: 3,
-              text: TextSpan(
-                text: texts,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Montserrat',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 15,
+          FractionallySizedBox(
+            widthFactor: 1,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(15, 5, 15, 0),
+              alignment: Alignment.topLeft,
+              width: 100,
+              height: 60,
+              child: RichText(
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+                text: TextSpan(
+                  text: texts,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        FractionallySizedBox(
-          widthFactor: 1,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(15, 5, 5, 0),
-            width: 100,
-            height: 35,
-            child: Row(
-              children: [
-                Text(
-                  author,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
+          FractionallySizedBox(
+            widthFactor: 1,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(15, 5, 5, 0),
+              width: 100,
+              height: 35,
+              child: Row(
+                children: [
+                  Text(
+                    author,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                    ),
                   ),
-                ),
-                Spacer(),
-                Text(
-                  date,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
+                  Spacer(),
+                  Text(
+                    DateFormat('yyyy.MM.dd').format(date),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                    ),
                   ),
-                ),
-                IconButton(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.thumb_up_alt_outlined,
-                    color: Colors.white,
-                  ),
-                )
-              ],
+                  IconButton(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.thumb_up_alt_outlined,
+                      color: Colors.white,
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
+  );
+}
+
+Widget second(
+    String docId, String title, String texts, String author, DateTime date) {
+  return GestureDetector(
+    onTap: () {
+      gotoQuestionViewPage(docId, title, texts, author, date);
+    },
+    child: Container(
+      height: 150,
+      margin: EdgeInsets.fromLTRB(8, 5, 8, 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Color.fromARGB(255, 89, 47, 178),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: [0, 0.35, 1],
+          colors: [
+            Color.fromARGB(255, 162, 61, 209),
+            Color.fromARGB(255, 148, 66, 205),
+            Color.fromARGB(255, 54, 27, 99)
+          ],
+        ),
+      ),
+      child: Column(
+        children: [
+          FractionallySizedBox(
+            widthFactor: 1,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+              alignment: Alignment.bottomLeft,
+              height: 43,
+              child: RichText(
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                text: TextSpan(
+                  text: title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          FractionallySizedBox(
+            widthFactor: 1,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(15, 5, 15, 0),
+              alignment: Alignment.topLeft,
+              width: 100,
+              height: 60,
+              child: RichText(
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+                text: TextSpan(
+                  text: texts,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          FractionallySizedBox(
+            widthFactor: 1,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(15, 5, 5, 0),
+              width: 100,
+              height: 35,
+              child: Row(
+                children: [
+                  Text(
+                    author,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                    ),
+                  ),
+                  Spacer(),
+                  Text(
+                    DateFormat('yyyy.MM.dd').format(date),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                    ),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.thumb_up_alt_outlined,
+                      color: Colors.white,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+void gotoQuestionViewPage(
+    String docId, String title, String texts, String author, DateTime date) {
+  print(docId);
+  navigatorKey.currentState?.pushNamed(
+    '/question_view_page',
+    arguments: {
+      "docId": docId,
+      "title": title,
+      "texts": texts,
+      "author": author,
+      "date": DateFormat('yyyy.MM.dd hh:mm').format(date)
+    },
   );
 }
