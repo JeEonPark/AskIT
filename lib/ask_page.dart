@@ -90,11 +90,12 @@ class _AskPageState extends State<AskPage> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final List<Widget> _children = [Ask(), Discuss(), Other()];
   int _currentIndex = 0;
-  void _onTap(int index){
+  void _onTap(int index) {
     setState(() {
       _currentIndex = index;
     });
-  } 
+  }
+
   @override
   Widget build(BuildContext context) {
     BuildContext contextGlobal = context;
@@ -406,278 +407,273 @@ class _AskState extends State<Ask> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 29, 30, 37),
       body: SafeArea(
-          //앱 전체 감싸는 div
-          child: Container(
-            child: Column(
-              children: [
-                //상단 바 div
-                Container(
-                  height: 70,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                        child: Text(
-                          "Ask",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 30,
-                          ),
+        //앱 전체 감싸는 div
+        child: Container(
+          child: Column(
+            children: [
+              //상단 바 div
+              Container(
+                height: 70,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Text(
+                        "Ask",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 30,
                         ),
                       ),
-                      Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
-                        child: Container(
-                          child: Row(
-                            children: [
-                              //검색버튼
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/route_button');
-                                },
-                                iconSize: 35,
-                                icon: const Icon(
-                                  Icons.search_rounded,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              //설정버튼
-                              IconButton(
-                                onPressed: () async {
-                                  Navigator.pop(context);
-                                  Navigator.pushNamed(context, '/');
-                                  await FirebaseAuth.instance.signOut();
-                                },
-                                iconSize: 35,
-                                icon: const Icon(
-                                  Icons.settings_outlined,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                //질문 선택 버튼 바
-                Container(
-                  height: 40,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Spacer(
-                        flex: 1,
-                      ),
-                      //My Question 버튼
-                      Column(
-                        children: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.all(0),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              splashFactory: NoSplash.splashFactory,
-                              primary: pageSelected == 1
-                                  ? Colors.white
-                                  : Color.fromARGB(100, 255, 255, 255),
-                              textStyle: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                pageSelected = 1;
-                              });
-                            },
-                            child: const Text("My Question"),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: pageSelected == 1
-                                  ? Colors.white
-                                  : const Color.fromARGB(0, 255, 255, 255),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(100)),
-                            ),
-                            margin: const EdgeInsets.all(0),
-                            padding: const EdgeInsets.all(0),
-                            width: 75,
-                            height: 2,
-                          ),
-                        ],
-                      ),
-                      const Spacer(
-                        flex: 1,
-                      ),
-                      //Others Question 버튼
-                      Column(
-                        children: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.all(0),
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap, //???
-                              splashFactory: NoSplash.splashFactory,
-                              primary: pageSelected == 2
-                                  ? Colors.white
-                                  : Color.fromARGB(100, 255, 255, 255),
-                              textStyle: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                pageSelected = 2;
-                              });
-                            },
-                            child: const Text("Others Question"),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: pageSelected == 2
-                                  ? Colors.white
-                                  : const Color.fromARGB(0, 255, 255, 255),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(100)),
-                            ),
-                            margin: const EdgeInsets.all(0),
-                            padding: const EdgeInsets.all(0),
-                            width: 75,
-                            height: 2,
-                          ),
-                        ],
-                      ),
-                      const Spacer(
-                        flex: 1,
-                      ),
-                    ],
-                  ),
-                ),
-                //회색 스크롤 배경
-                Expanded(
-                  child: FractionallySizedBox(
-                    heightFactor: 0.97,
-                    widthFactor: 0.95,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Color.fromARGB(25, 255, 255, 255),
+                        child: Row(
+                          children: [
+                            //검색버튼
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/route_button');
+                              },
+                              iconSize: 35,
+                              icon: const Icon(
+                                Icons.search_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                            //설정버튼
+                            IconButton(
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/');
+                                await FirebaseAuth.instance.signOut();
+                              },
+                              iconSize: 35,
+                              icon: const Icon(
+                                Icons.settings_outlined,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: FutureBuilder(
-                          future: getDocument(),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.hasData == false) {
-                              //데이터 받아오는중
-                              return Text("loading");
-                            } else {
-                              //데이터 다 받아옴
-                              return RefreshIndicator(
-                                onRefresh: () async {
-                                  setState(() {
-                                    getDocument();
-                                  });
-                                },
-                                child: SingleChildScrollView(
-                                  physics: AlwaysScrollableScrollPhysics(),
-                                  child: Column(
-                                    children: [
-                                      for (int i = 0;
-                                          i < snapshot.data.length;
-                                          i++)
-                                        i % 2 == 0
-                                            ? Column(
-                                                children: [
-                                                  if (i == 0)
-                                                    SizedBox(height: 5),
-                                                  first(
-                                                      snapshot.data.keys
-                                                          .elementAt(i),
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['title'],
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['texts'],
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['author'],
-                                                      snapshot.data.values
-                                                          .elementAt(i)?['date']
-                                                          .toDate()),
-                                                  if (i ==
-                                                      snapshot.data.length - 1)
-                                                    SizedBox(height: 5),
-                                                ],
-                                              )
-                                            : Column(
-                                                children: [
-                                                  second(
-                                                      snapshot.data.keys
-                                                          .elementAt(i),
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['title'],
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['texts'],
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['author'],
-                                                      snapshot.data.values
-                                                          .elementAt(i)?['date']
-                                                          .toDate()),
-                                                  if (i ==
-                                                      snapshot.data.length - 1)
-                                                    SizedBox(height: 5),
-                                                ],
-                                              ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              //질문 선택 버튼 바
+              Container(
+                height: 40,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Spacer(
+                      flex: 1,
+                    ),
+                    //My Question 버튼
+                    Column(
+                      children: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.all(0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            splashFactory: NoSplash.splashFactory,
+                            primary: pageSelected == 1
+                                ? Colors.white
+                                : Color.fromARGB(100, 255, 255, 255),
+                            textStyle: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Montserrat',
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              pageSelected = 1;
+                            });
                           },
+                          child: const Text("My Question"),
                         ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: pageSelected == 1
+                                ? Colors.white
+                                : const Color.fromARGB(0, 255, 255, 255),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(100)),
+                          ),
+                          margin: const EdgeInsets.all(0),
+                          padding: const EdgeInsets.all(0),
+                          width: 75,
+                          height: 2,
+                        ),
+                      ],
+                    ),
+                    const Spacer(
+                      flex: 1,
+                    ),
+                    //Others Question 버튼
+                    Column(
+                      children: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.all(0),
+                            tapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap, //???
+                            splashFactory: NoSplash.splashFactory,
+                            primary: pageSelected == 2
+                                ? Colors.white
+                                : Color.fromARGB(100, 255, 255, 255),
+                            textStyle: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Montserrat',
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              pageSelected = 2;
+                            });
+                          },
+                          child: const Text("Others Question"),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: pageSelected == 2
+                                ? Colors.white
+                                : const Color.fromARGB(0, 255, 255, 255),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(100)),
+                          ),
+                          margin: const EdgeInsets.all(0),
+                          padding: const EdgeInsets.all(0),
+                          width: 75,
+                          height: 2,
+                        ),
+                      ],
+                    ),
+                    const Spacer(
+                      flex: 1,
+                    ),
+                  ],
+                ),
+              ),
+              //회색 스크롤 배경
+              Expanded(
+                child: FractionallySizedBox(
+                  heightFactor: 0.97,
+                  widthFactor: 0.95,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Color.fromARGB(25, 255, 255, 255),
+                      ),
+                      child: FutureBuilder(
+                        future: getDocument(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData == false) {
+                            //데이터 받아오는중
+                            return Text("loading");
+                          } else {
+                            //데이터 다 받아옴
+                            return RefreshIndicator(
+                              onRefresh: () async {
+                                setState(() {
+                                  getDocument();
+                                });
+                              },
+                              child: SingleChildScrollView(
+                                physics: AlwaysScrollableScrollPhysics(),
+                                child: Column(
+                                  children: [
+                                    for (int i = 0;
+                                        i < snapshot.data.length;
+                                        i++)
+                                      i % 2 == 0
+                                          ? Column(
+                                              children: [
+                                                if (i == 0) SizedBox(height: 5),
+                                                first(
+                                                    snapshot.data.keys
+                                                        .elementAt(i),
+                                                    snapshot.data.values
+                                                        .elementAt(i)?['title'],
+                                                    snapshot.data.values
+                                                        .elementAt(i)?['texts'],
+                                                    snapshot.data.values
+                                                        .elementAt(
+                                                            i)?['author'],
+                                                    snapshot.data.values
+                                                        .elementAt(i)?['date']
+                                                        .toDate()),
+                                                if (i ==
+                                                    snapshot.data.length - 1)
+                                                  SizedBox(height: 5),
+                                              ],
+                                            )
+                                          : Column(
+                                              children: [
+                                                second(
+                                                    snapshot.data.keys
+                                                        .elementAt(i),
+                                                    snapshot.data.values
+                                                        .elementAt(i)?['title'],
+                                                    snapshot.data.values
+                                                        .elementAt(i)?['texts'],
+                                                    snapshot.data.values
+                                                        .elementAt(
+                                                            i)?['author'],
+                                                    snapshot.data.values
+                                                        .elementAt(i)?['date']
+                                                        .toDate()),
+                                                if (i ==
+                                                    snapshot.data.length - 1)
+                                                  SizedBox(height: 5),
+                                              ],
+                                            ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        //플로팅 액션 버튼
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Add your onPressed code here!
-            navigatorKey.currentState?.pushNamed('/add_question_page');
-          },
-          backgroundColor: Colors.white,
-          child: const Icon(
-            Icons.add_outlined,
-            color: Colors.black,
-            size: 35,
-          ),
-        ),);
+      ),
+      //플로팅 액션 버튼
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Add your onPressed code here!
+          navigatorKey.currentState?.pushNamed('/add_question_page');
+        },
+        backgroundColor: Colors.white,
+        child: const Icon(
+          Icons.add_outlined,
+          color: Colors.black,
+          size: 35,
+        ),
+      ),
+    );
   }
 }
 
 class Discuss extends StatefulWidget {
-
   @override
   State<Discuss> createState() => _DiscussState();
 }
