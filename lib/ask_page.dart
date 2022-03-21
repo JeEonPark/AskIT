@@ -7,6 +7,7 @@ import 'main.dart';
 import 'package:ask_it/main.dart';
 
 //전역변수
+//안녕하세요
 int pageSelected = 1;
 
 class AskPage extends StatefulWidget {
