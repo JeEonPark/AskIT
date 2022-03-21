@@ -437,7 +437,7 @@ class _AskState extends State<Ask> {
                               //검색버튼
                               IconButton(
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/route_button');
+                                  navigatorKey.currentState?.pushNamed('/route_button');
                                 },
                                 iconSize: 35,
                                 icon: const Icon(
