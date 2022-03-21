@@ -111,37 +111,43 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                             color: Color.fromARGB(255, 127, 116, 255),
                           ),
                           Spacer(),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            height: 45,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Icon(
-                                    Icons.question_answer_outlined,
-                                    size: 22,
-                                    color: Colors.black,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    "Answer this question",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'Montserrat',
-                                      color: Colors.black,
+                          Row(
+                            children: [
+                              Spacer(),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.7,
+                                height: 45,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
                                     ),
                                   ),
-                                ],
+                                  onPressed: () {},
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(
+                                        Icons.question_answer_outlined,
+                                        size: 30,
+                                        color: Colors.black,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "Answer this question",
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontFamily: 'Montserrat',
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
+                              Spacer(),
+                            ],
                           ),
                         ],
                       ),
