@@ -93,7 +93,6 @@ class _AskPageState extends State<AskPage> {
 
   @override
   Widget build(BuildContext context) {
-    BuildContext contextGlobal = context;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(

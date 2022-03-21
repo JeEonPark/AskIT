@@ -42,7 +42,7 @@ void main() async {
         '/add_question_page': (context) => AddQuestionPage(),
         '/question_view_page': (context) => QuestionViewPage(),
         '/route_button': (context) => RouteButton(),
-        '/ask_answer_meghod_page': (context) => AskAnswerMethodPage(),
+        '/ask_answer_method_page': (context) => AskAnswerMethodPage(),
       },
     ),
   );

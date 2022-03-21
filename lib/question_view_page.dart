@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ask_it/main.dart';
+
+import 'main.dart';
 
 class QuestionViewPage extends StatefulWidget {
   QuestionViewPage({Key? key}) : super(key: key);
@@ -124,7 +127,10 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                       borderRadius: BorderRadius.circular(30),
                                     ),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, '/ask_answer_method_page');
+                                  },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: const [
