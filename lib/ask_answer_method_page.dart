@@ -17,18 +17,34 @@ class _AskAnswerMethodPageState extends State<AskAnswerMethodPage> {
         body: SafeArea(
           child: Column(
             children: [
+              //상단바 영역
               Container(
                 alignment: Alignment.centerLeft,
                 width: MediaQuery.of(context).size.width,
                 height: 80,
-                child: IconButton(
-                  padding: EdgeInsets.all(20),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(Icons.arrow_back_rounded),
-                  color: Colors.white,
-                  iconSize: 35,
+                child: Row(
+                  children: [
+                    //뒤로가기 버튼
+                    IconButton(
+                      padding: EdgeInsets.all(20),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.arrow_back_rounded),
+                      color: Colors.white,
+                      iconSize: 35,
+                    ),
+                    //Answer 텍스트
+                    const Text(
+                      "Answer",
+                      style: TextStyle(
+                        fontFamily: "Montserrat",
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Column(
