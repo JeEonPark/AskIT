@@ -1,3 +1,6 @@
+### 절대 이 레포지토리 Public 으로 바꾸지 말 것.
+### DB 정보 포함
+
 # ask_it
 
 A new Flutter project.
