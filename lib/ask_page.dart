@@ -428,6 +428,7 @@ class _AskState extends State<Ask> {
                           fontSize: 30,
                         ),
                       ),
+<<<<<<< HEAD
                     ),
                     Spacer(),
                     Padding(
@@ -444,6 +445,24 @@ class _AskState extends State<Ask> {
                               icon: const Icon(
                                 Icons.search_rounded,
                                 color: Colors.white,
+=======
+                      Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
+                        child: Container(
+                          child: Row(
+                            children: [
+                              //검색버튼
+                              IconButton(
+                                onPressed: () {
+                                  navigatorKey.currentState?.pushNamed('/route_button');
+                                },
+                                iconSize: 35,
+                                icon: const Icon(
+                                  Icons.search_rounded,
+                                  color: Colors.white,
+                                ),
+>>>>>>> c12c28743b057713dbc6b4e729dae33b84b63aa0
                               ),
                             ),
                             //설정버튼
