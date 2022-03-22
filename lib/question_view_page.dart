@@ -12,11 +12,6 @@ class QuestionViewPage extends StatefulWidget {
   State<QuestionViewPage> createState() => _QuestionViewPageState();
 }
 
-class Arguments {
-  final String docId;
-  Arguments({required this.docId});
-}
-
 // Future<Map<String, dynamic>?> getDocument(String docId) async {
 //   final documentData = await FirebaseFirestore.instance
 //       .collection("AskPage_Questions")
@@ -129,7 +124,15 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                   ),
                                   onPressed: () {
                                     Navigator.pushNamed(
-                                        context, '/ask_answer_method_page');
+                                      context,
+                                      '/ask_answer_method_page',
+                                      arguments: {
+                                        "docId": args['docId'],
+                                        "title": args['title'],
+                                        "texts": args['texts'],
+                                        "author": args['author'],
+                                      },
+                                    );
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

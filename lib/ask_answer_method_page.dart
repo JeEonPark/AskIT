@@ -11,6 +11,7 @@ class AskAnswerMethodPage extends StatefulWidget {
 class _AskAnswerMethodPageState extends State<AskAnswerMethodPage> {
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -79,7 +80,15 @@ class _AskAnswerMethodPageState extends State<AskAnswerMethodPage> {
                       ),
                       onPressed: () {
                         navigatorKey.currentState?.pop();
-                        navigatorKey.currentState?.pushNamed('/message_page');
+                        navigatorKey.currentState?.pushNamed(
+                          '/message_page',
+                          arguments: {
+                            "docId": args['docId'],
+                            "title": args['title'],
+                            "texts": args['texts'],
+                            "author": args['author'],
+                          },
+                        );
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

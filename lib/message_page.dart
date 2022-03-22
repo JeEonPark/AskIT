@@ -1,5 +1,7 @@
 import 'package:ask_it/main.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MessagePage extends StatefulWidget {
   MessagePage({Key? key}) : super(key: key);
@@ -8,9 +10,64 @@ class MessagePage extends StatefulWidget {
   State<MessagePage> createState() => _MessagePageState();
 }
 
+//채팅방 Id 불러오기
+Future<String> getChatRoomId(String questionDocId) async {
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("AskPage_Questions")
+      .doc(questionDocId)
+      .collection("ChatRoom")
+      .where(
+        'replier',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
+      .get();
+
+  return snapshot.docs.elementAt(0).id;
+}
+
+Future<List> getDocumentList(String questionDocId) async {
+  List<String> lists = [];
+  String chatRoomId = await getChatRoomId(questionDocId);
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("AskPage_Questions")
+      .doc(questionDocId)
+      .collection("ChatRoom")
+      .doc(chatRoomId)
+      .collection("Messages")
+      .orderBy('date', descending: false)
+      .get();
+  snapshot.docs.forEach((element) {
+    lists.add(element.id);
+  });
+
+  return lists;
+}
+
+// Map<글 코드, 글 데이터맵>
+Future<Map> getDocument(String questionDocId) async {
+  String chatRoomId = await getChatRoomId(questionDocId);
+  List lists = await getDocumentList(questionDocId); //
+  Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
+
+  for (int i = 0; i < lists.length; i++) {
+    final documentData = await FirebaseFirestore.instance
+        .collection("AskPage_Questions")
+        .doc(questionDocId)
+        .collection("ChatRoom")
+        .doc(chatRoomId)
+        .collection("Messages")
+        .doc(lists[i])
+        .get();
+    map[lists[i]] = documentData.data();
+  }
+
+  return map;
+}
+
 class _MessagePageState extends State<MessagePage> {
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
     return SafeArea(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -53,21 +110,21 @@ class _MessagePageState extends State<MessagePage> {
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        MessageFromMe(),
-                        MessageFromOthers(),
-                        MessageFromMe(),
-                        MessageFromOthers(),
-                        MessageFromMe(),
-                        MessageFromOthers(),
-                        MessageFromMe(),
-                        MessageFromOthers(),
-                        MessageFromMe(),
-                        MessageFromOthers(),
-                        MessageFromOthers(),
-                      ],
-                    ),
+                    reverse: true,
+                    child: FutureBuilder(
+                        future: getDocument(args["docId"]),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData == false) {
+                            //데이터 받아오는중
+                            return Text("loading");
+                          } else {
+                            print(snapshot.data);
+                            return Column(
+                              children: [],
+                            );
+                          }
+                        }),
                   ),
                 ),
               ),
@@ -149,7 +206,7 @@ Widget MessageFromMe() {
           children: [
             SizedBox(
               child: Text(
-                "Nan Park",
+                "JeEon Park",
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: "Montserrat",
@@ -210,7 +267,7 @@ Widget MessageFromOthers() {
             SizedBox(width: 28),
             SizedBox(
               child: Text(
-                "JeEon Park",
+                "Nan Park",
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: "Montserrat",
