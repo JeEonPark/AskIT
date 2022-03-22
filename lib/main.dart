@@ -1,6 +1,7 @@
 import 'package:ask_it/add_question_page.dart';
 import 'package:ask_it/ask_answer_method_page.dart';
 import 'package:ask_it/login_page.dart';
+import 'package:ask_it/message_page.dart';
 import 'package:ask_it/question_view_page.dart';
 import 'package:ask_it/sign_up_page.dart';
 import 'package:ask_it/add_question_page.dart';
@@ -11,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ask_it/question_view_page.dart';
 import 'package:ask_it/route_button.dart';
 import 'package:ask_it/ask_answer_method_page.dart';
+import 'package:ask_it/message_page.dart';
 
 import 'ask_page.dart';
 import 'login_page.dart';
@@ -19,6 +21,7 @@ import 'add_question_page.dart';
 import 'question_view_page.dart';
 import 'route_button.dart';
 import 'ask_answer_method_page.dart';
+import 'message_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -43,6 +46,7 @@ void main() async {
         '/question_view_page': (context) => QuestionViewPage(),
         '/route_button': (context) => RouteButton(),
         '/ask_answer_method_page': (context) => AskAnswerMethodPage(),
+        '/message_page': (context) => MessagePage(),
       },
     ),
   );

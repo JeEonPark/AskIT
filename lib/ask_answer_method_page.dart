@@ -1,3 +1,4 @@
+import 'package:ask_it/main.dart';
 import 'package:flutter/material.dart';
 
 class AskAnswerMethodPage extends StatefulWidget {
@@ -76,7 +77,10 @@ class _AskAnswerMethodPageState extends State<AskAnswerMethodPage> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        navigatorKey.currentState?.pop();
+                        navigatorKey.currentState?.pushNamed('/message_page');
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
