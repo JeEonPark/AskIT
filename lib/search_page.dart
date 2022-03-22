@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class RouteButton extends StatefulWidget {
-  RouteButton({Key? key}) : super(key: key);
+class SearchPage extends StatefulWidget {
+  SearchPage({Key? key}) : super(key: key);
 
   @override
-  State<RouteButton> createState() => _RouteButtonState();
+  State<SearchPage> createState() => _SearchPageState();
 }
 
-class _RouteButtonState extends State<RouteButton> {
+class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,9 +15,7 @@ class _RouteButtonState extends State<RouteButton> {
         child: Column(
           children: [
             ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/question_view_page');
-                },
+                onPressed: (){},
                 child: Text("To view question")),
             ElevatedButton(
                 onPressed: () {
