@@ -439,7 +439,7 @@ class _AskState extends State<Ask> {
                             IconButton(
                               onPressed: () {
                                 navigatorKey.currentState
-                                    ?.pushNamed('/route_button');
+                                    ?.pushNamed('/search_page');
                               },
                               iconSize: 35,
                               icon: const Icon(
@@ -674,6 +674,7 @@ class _AskState extends State<Ask> {
   }
 }
 
+//Discuss 페이지
 class Discuss extends StatefulWidget {
   @override
   State<Discuss> createState() => _DiscussState();
@@ -686,6 +687,7 @@ class _DiscussState extends State<Discuss> {
   }
 }
 
+//Others 페이지
 class Other extends StatefulWidget {
   @override
   State<Other> createState() => _OtherState();

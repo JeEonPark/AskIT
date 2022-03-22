@@ -10,7 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ask_it/question_view_page.dart';
-import 'package:ask_it/route_button.dart';
+import 'package:ask_it/search_page.dart';
 import 'package:ask_it/ask_answer_method_page.dart';
 import 'package:ask_it/message_page.dart';
 
@@ -19,7 +19,7 @@ import 'login_page.dart';
 import 'sign_up_page.dart';
 import 'add_question_page.dart';
 import 'question_view_page.dart';
-import 'route_button.dart';
+import 'search_page.dart';
 import 'ask_answer_method_page.dart';
 import 'message_page.dart';
 
@@ -44,7 +44,7 @@ void main() async {
         '/ask_page': (context) => AskPage(),
         '/add_question_page': (context) => AddQuestionPage(),
         '/question_view_page': (context) => QuestionViewPage(),
-        '/route_button': (context) => RouteButton(),
+        '/search_page': (context) => SearchPage(),
         '/ask_answer_method_page': (context) => AskAnswerMethodPage(),
         '/message_page': (context) => MessagePage(),
       },
