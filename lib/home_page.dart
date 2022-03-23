@@ -11,9 +11,9 @@ import 'package:ask_it/main.dart';
 //박무바보
 int pageSelected = 1;
 
-class AskPage extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  State<AskPage> createState() => _AskPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 // void readdata() async {
@@ -85,7 +85,7 @@ Future<Map> getDocument() async {
   return map;
 }
 
-class _AskPageState extends State<AskPage> {
+class _HomePageState extends State<HomePage> {
   //변수들
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final List<Widget> _children = [Ask(), Discuss(), Other()];
@@ -138,15 +138,15 @@ class _AskPageState extends State<AskPage> {
               items: const [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.question_answer_outlined),
-                  label: ('Favourite'),
+                  label: ('Ask'),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
-                  label: ('Favourite'),
+                  label: ('Discuss'),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
-                  label: ('Favourite'),
+                  label: ('Others'),
                 ),
               ],
             ),

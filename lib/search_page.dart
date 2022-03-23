@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
-import 'ask_page.dart';
+import 'home_page.dart';
 import 'main.dart';
 import 'package:ask_it/main.dart';
 
@@ -314,7 +314,7 @@ class _SearchPageState extends State<SearchPage> {
                           decoration: InputDecoration(
                             isDense: true,
                             contentPadding:
-                                const EdgeInsets.fromLTRB(14, 8, 8, 8),
+                                const EdgeInsets.fromLTRB(14, 8, 14, 8),
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.circular(10),
