@@ -12,20 +12,76 @@ class QuestionViewPage extends StatefulWidget {
   State<QuestionViewPage> createState() => _QuestionViewPageState();
 }
 
-// Future<Map<String, dynamic>?> getDocument(String docId) async {
-//   final documentData = await FirebaseFirestore.instance
-//       .collection("AskPage_Questions")
-//       .doc(docId)
-//       .get();
-//   print(documentData.data()!["texts"]);
+//My Answer 최우선, 나머지 답변들
+Future<List> chatRoomList(String questionDocId) async {
+  List result = [];
 
-//   return documentData.data();
+  //내 답변
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('AskPage_Questions')
+      .doc(questionDocId)
+      .collection("ChatRoom")
+      .where('replier', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+      .get();
+  if (snapshot.docs.length == 1) {
+    result.add(snapshot.docs.elementAt(0).id);
+  }
+
+  //나머지 답변
+  snapshot = await FirebaseFirestore.instance
+      .collection('AskPage_Questions')
+      .doc(questionDocId)
+      .collection("ChatRoom")
+      .get();
+  snapshot.docs.forEach((element) {
+    if (element.get("replier") != FirebaseAuth.instance.currentUser?.uid) {
+      result.add(element.id);
+    }
+  });
+
+  return result;
+}
+
+//Map<채팅방 uid, 마지막 채팅>
+Future<Map> mapChatroomUidChat(String questionDocId) async {
+  List list = await chatRoomList(questionDocId);
+  Map map = {};
+  list.forEach((element) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('AskPage_Questions')
+        .doc(questionDocId)
+        .collection("ChatRoom")
+        .doc(element)
+        .collection("Messages")
+        .orderBy('date', descending: true)
+        .get();
+    map[element] = snapshot.docs.first.get("texts");
+  });
+
+  print(map);
+  return map;
+}
+
+// Future<bool> myAnswer(String questionDocId) async {
+//   QuerySnapshot snapshot = await FirebaseFirestore.instance
+//       .collection('AskPage_Questions')
+//       .doc(questionDocId)
+//       .collection("ChatRoom")
+//       .where('replier', isEqualTo: "asd")
+//       .get();
+
+//   if (snapshot.docs.length == 0) {
+//     return false;
+//   }
+
+//   return true;
 // }
 
 class _QuestionViewPageState extends State<QuestionViewPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
+    mapChatroomUidChat(args['docId']);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -55,110 +111,159 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                     Container(
                       height: MediaQuery.of(context).size.height * 0.825,
                       width: MediaQuery.of(context).size.width * 0.86,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          //제목
-                          Text(
-                            args["title"],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          //이름 날짜
-                          Row(
-                            children: [
-                              Text(
-                                args["author"],
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontFamily: 'Montserrat',
-                                ),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            //제목
+                            Text(
+                              args["title"],
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(width: 5),
-                              Text(
-                                args["date"],
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontFamily: 'Montserrat',
-                                ),
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 12),
-                          //글
-                          Text(
-                            args["texts"],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontFamily: 'Montserrat',
                             ),
-                          ),
-                          //이미지
-                          //하단 구분선
-                          SizedBox(height: 14),
-                          Container(
-                            height: 1,
-                            color: Color.fromARGB(255, 127, 116, 255),
-                          ),
-                          Spacer(),
-                          Row(
-                            children: [
-                              Spacer(),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.7,
-                                height: 45,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
+                            SizedBox(height: 8),
+                            //이름 날짜
+                            Row(
+                              children: [
+                                Text(
+                                  args["author"],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontFamily: 'Montserrat',
                                   ),
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/ask_answer_method_page',
-                                      arguments: {
-                                        "docId": args['docId'],
-                                        "title": args['title'],
-                                        "texts": args['texts'],
-                                        "author": args['author'],
-                                      },
-                                    );
-                                  },
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  args["date"],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontFamily: 'Montserrat',
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: 12),
+                            //글
+                            Text(
+                              args["texts"],
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontFamily: 'Montserrat',
+                              ),
+                            ),
+                            //이미지
+                            //하단 구분선
+                            SizedBox(height: 14),
+                            Container(
+                              height: 1,
+                              color: Color.fromARGB(255, 127, 116, 255),
+                            ),
+                            SizedBox(height: 25),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 내 답변
+                                Container(
+                                  height: 70,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.86,
+                                  decoration: BoxDecoration(
+                                    color: Color.fromARGB(255, 127, 116, 255),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(
-                                        Icons.question_answer_outlined,
-                                        size: 30,
-                                        color: Colors.black,
+                                    children: [
+                                      SizedBox(width: 15),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "My Answer",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: "Montserrat",
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            "So did you understand my answer?",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: "Montserrat",
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Answer this question",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontFamily: 'Montserrat',
-                                          color: Colors.black,
-                                        ),
-                                      ),
+                                      SizedBox(width: 15),
                                     ],
                                   ),
                                 ),
-                              ),
-                              Spacer(),
-                            ],
-                          ),
-                        ],
+                                //하단 구분선
+                                SizedBox(height: 14),
+                                Container(
+                                  height: 1,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(height: 14),
+                                // 타인 답변
+                                Container(
+                                  height: 70,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.86,
+                                  decoration: BoxDecoration(
+                                    color: Color.fromARGB(255, 80, 87, 152),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 15),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Severus",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: "Montserrat",
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            "umm. okay",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: "Montserrat",
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(width: 15),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -167,6 +272,35 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
             ],
           ),
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/ask_answer_method_page',
+              arguments: {
+                "docId": args['docId'],
+                "title": args['title'],
+                "texts": args['texts'],
+                "author": args['author'],
+              },
+            );
+          },
+          backgroundColor: Colors.white,
+          icon: Icon(
+            Icons.question_answer_outlined,
+            size: 30,
+            color: Colors.black,
+          ),
+          label: Text(
+            'Answer this Question',
+            style: TextStyle(
+              fontSize: 18,
+              fontFamily: 'Montserrat',
+              color: Colors.black,
+            ),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
