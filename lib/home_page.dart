@@ -9,7 +9,9 @@ import 'package:ask_it/main.dart';
 //전역변수
 //안녕하세요
 //박무바보
-int pageSelected = 1;
+int askPageSelected = 1;
+int discussPageSelected = 1;
+int _currentIndex = 0;
 
 class HomePage extends StatefulWidget {
   @override
@@ -31,9 +33,9 @@ class HomePage extends StatefulWidget {
 //   // usercol.get().then((value) => {print(value.data())});
 // }
 
-Future<List> getDocumentList() async {
+Future<List> askGetDocumnetList() async {
   List<String> lists = [];
-  if (pageSelected == 1) {
+  if (askPageSelected == 1) {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection("AskPage_Questions")
         .orderBy('date', descending: true)
@@ -45,7 +47,7 @@ Future<List> getDocumentList() async {
     snapshot.docs.forEach((element) {
       lists.add(element.id);
     });
-  } else if (pageSelected == 2) {
+  } else if (askPageSelected == 2) {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection("AskPage_Questions")
         .orderBy('date', descending: true)
@@ -59,8 +61,8 @@ Future<List> getDocumentList() async {
 }
 
 // Map<글 코드, 글 데이터맵>
-Future<Map> getDocument() async {
-  List lists = await getDocumentList(); //
+Future<Map> askGetDocument() async {
+  List lists = await askGetDocumnetList(); //
   Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
 
   for (int i = 0; i < lists.length; i++) {
@@ -72,7 +74,7 @@ Future<Map> getDocument() async {
   }
   // print(DateFormat('yyyy.MM.dd')
   //     .format(map.values.elementAt(0)?['date'].toDate()));
-  if (pageSelected == 2) {
+  if (askPageSelected == 2) {
     for (int i = 0; i < map.length; i++) {
       if (map.values.elementAt(i)?['uid'] ==
           FirebaseAuth.instance.currentUser?.uid) {
@@ -85,11 +87,72 @@ Future<Map> getDocument() async {
   return map;
 }
 
+Future<List> discussGetDocumnetList() async {
+  List<String> lists = [];
+  if (discussPageSelected == 1) {
+    //Explore 페이지
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("DiscussPage_Sessions")
+        .orderBy('date', descending: true)
+        .where('ended', isEqualTo: false) //끝난 페이지는 제외
+        .get();
+    snapshot.docs.forEach((element) {
+      lists.add(element.id);
+    });
+  } else if (discussPageSelected == 2) {
+    //Joined 페이지
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("DiscussPage_Sessions")
+        .orderBy('date', descending: true)
+        .where('joined', arrayContains: FirebaseAuth.instance.currentUser?.uid)
+        .get();
+    snapshot.docs.forEach((element) {
+      lists.add(element.id);
+    });
+  } else if (discussPageSelected == 3) {
+    //Ended 페이지
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("DiscussPage_Sessions")
+        .orderBy('date', descending: true)
+        .where('ended', isEqualTo: true)
+        .get();
+    snapshot.docs.forEach((element) {
+      lists.add(element.id);
+    });
+  }
+
+  return lists;
+}
+
+// Map<글 코드, 글 데이터맵>
+Future<Map> discussGetDocument() async {
+  List lists = await discussGetDocumnetList(); //
+  Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
+
+  for (int i = 0; i < lists.length; i++) {
+    final documentData = await FirebaseFirestore.instance
+        .collection("DiscussPage_Sessions")
+        .doc(lists[i])
+        .get();
+    map[lists[i]] = documentData.data();
+  }
+  //if (askPageSelected == 2) {
+  //  for (int i = 0; i < map.length; i++) {
+  //    if (map.values.elementAt(i)?['uid'] ==
+  //        FirebaseAuth.instance.currentUser?.uid) {
+  //      map.remove(map.keys.elementAt(i));
+  //      i--;
+  //    }
+  //  }
+  //}
+
+  return map;
+}
+
 class _HomePageState extends State<HomePage> {
   //변수들
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final List<Widget> _children = [Ask(), Discuss(), Other()];
-  int _currentIndex = 0;
   void _onTap(int index) {
     setState(() {
       _currentIndex = index;
@@ -384,16 +447,21 @@ Widget second(
 void gotoQuestionViewPage(
     String docId, String title, String texts, String author, DateTime date) {
   print(docId);
-  navigatorKey.currentState?.pushNamed(
-    '/question_view_page',
-    arguments: {
-      "docId": docId,
-      "title": title,
-      "texts": texts,
-      "author": author,
-      "date": DateFormat('yyyy.MM.dd hh:mm').format(date)
-    },
-  );
+  if (_currentIndex == 0) {
+    navigatorKey.currentState?.pushNamed(
+      '/question_view_page',
+      arguments: {
+        "docId": docId,
+        "title": title,
+        "texts": texts,
+        "author": author,
+        "date": DateFormat('yyyy.MM.dd hh:mm').format(date)
+      },
+    );
+  } else if (_currentIndex == 1) {
+    navigatorKey.currentState
+        ?.pushNamed('/session_view_page', arguments: {"docId": docId});
+  }
 }
 
 class Ask extends StatefulWidget {
@@ -485,7 +553,7 @@ class _AskState extends State<Ask> {
                             padding: EdgeInsets.all(0),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             splashFactory: NoSplash.splashFactory,
-                            primary: pageSelected == 1
+                            primary: askPageSelected == 1
                                 ? Colors.white
                                 : Color.fromARGB(100, 255, 255, 255),
                             textStyle: const TextStyle(
@@ -496,14 +564,14 @@ class _AskState extends State<Ask> {
                           ),
                           onPressed: () {
                             setState(() {
-                              pageSelected = 1;
+                              askPageSelected = 1;
                             });
                           },
                           child: const Text("My Question"),
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: pageSelected == 1
+                            color: askPageSelected == 1
                                 ? Colors.white
                                 : const Color.fromARGB(0, 255, 255, 255),
                             borderRadius:
@@ -528,7 +596,7 @@ class _AskState extends State<Ask> {
                             tapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap, //???
                             splashFactory: NoSplash.splashFactory,
-                            primary: pageSelected == 2
+                            primary: askPageSelected == 2
                                 ? Colors.white
                                 : Color.fromARGB(100, 255, 255, 255),
                             textStyle: const TextStyle(
@@ -539,14 +607,14 @@ class _AskState extends State<Ask> {
                           ),
                           onPressed: () {
                             setState(() {
-                              pageSelected = 2;
+                              askPageSelected = 2;
                             });
                           },
                           child: const Text("Others Question"),
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: pageSelected == 2
+                            color: askPageSelected == 2
                                 ? Colors.white
                                 : const Color.fromARGB(0, 255, 255, 255),
                             borderRadius:
@@ -579,7 +647,7 @@ class _AskState extends State<Ask> {
                         color: Color.fromARGB(25, 255, 255, 255),
                       ),
                       child: FutureBuilder(
-                        future: getDocument(),
+                        future: askGetDocument(),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.hasData == false) {
@@ -590,7 +658,7 @@ class _AskState extends State<Ask> {
                             return RefreshIndicator(
                               onRefresh: () async {
                                 setState(() {
-                                  getDocument();
+                                  askGetDocument();
                                 });
                               },
                               child: SingleChildScrollView(
@@ -610,7 +678,8 @@ class _AskState extends State<Ask> {
                                                     snapshot.data.values
                                                         .elementAt(i)?['title'],
                                                     snapshot.data.values
-                                                        .elementAt(i)?['texts'],
+                                                        .elementAt(i)?['texts']
+                                                        .replaceAll("\\n", " "),
                                                     snapshot.data.values
                                                         .elementAt(
                                                             i)?['author'],
@@ -630,7 +699,8 @@ class _AskState extends State<Ask> {
                                                     snapshot.data.values
                                                         .elementAt(i)?['title'],
                                                     snapshot.data.values
-                                                        .elementAt(i)?['texts'],
+                                                        .elementAt(i)?['texts']
+                                                        .replaceAll("\\n", " "),
                                                     snapshot.data.values
                                                         .elementAt(
                                                             i)?['author'],
@@ -749,99 +819,133 @@ class _DiscussState extends State<Discuss> {
               //질문 선택 버튼 바
               Container(
                 height: 40,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Spacer(
-                      flex: 1,
-                    ),
-                    //My Question 버튼
-                    Column(
-                      children: [
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.all(0),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            splashFactory: NoSplash.splashFactory,
-                            primary: pageSelected == 1
-                                ? Colors.white
-                                : Color.fromARGB(100, 255, 255, 255),
-                            textStyle: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Montserrat',
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //Explore 버튼
+                      Column(
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.all(0),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              splashFactory: NoSplash.splashFactory,
+                              primary: discussPageSelected == 1
+                                  ? Colors.white
+                                  : Color.fromARGB(100, 255, 255, 255),
+                              textStyle: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Montserrat',
+                              ),
                             ),
+                            onPressed: () {
+                              setState(() {
+                                discussPageSelected = 1;
+                              });
+                            },
+                            child: const Text("Explore"),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              pageSelected = 1;
-                            });
-                          },
-                          child: const Text("My Question"),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: pageSelected == 1
-                                ? Colors.white
-                                : const Color.fromARGB(0, 255, 255, 255),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
-                          ),
-                          margin: const EdgeInsets.all(0),
-                          padding: const EdgeInsets.all(0),
-                          width: 75,
-                          height: 2,
-                        ),
-                      ],
-                    ),
-                    const Spacer(
-                      flex: 1,
-                    ),
-                    //Others Question 버튼
-                    Column(
-                      children: [
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.all(0),
-                            tapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap, //???
-                            splashFactory: NoSplash.splashFactory,
-                            primary: pageSelected == 2
-                                ? Colors.white
-                                : Color.fromARGB(100, 255, 255, 255),
-                            textStyle: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Montserrat',
+                          Container(
+                            decoration: BoxDecoration(
+                              color: discussPageSelected == 1
+                                  ? Colors.white
+                                  : const Color.fromARGB(0, 255, 255, 255),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(100)),
                             ),
+                            margin: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.all(0),
+                            width: 75,
+                            height: 2,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              pageSelected = 2;
-                            });
-                          },
-                          child: const Text("Others Question"),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: pageSelected == 2
-                                ? Colors.white
-                                : const Color.fromARGB(0, 255, 255, 255),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
+                        ],
+                      ),
+                      //Joined 버튼
+                      Column(
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.all(0),
+                              tapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap, //???
+                              splashFactory: NoSplash.splashFactory,
+                              primary: discussPageSelected == 2
+                                  ? Colors.white
+                                  : Color.fromARGB(100, 255, 255, 255),
+                              textStyle: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Montserrat',
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                discussPageSelected = 2;
+                              });
+                            },
+                            child: const Text("Joined"),
                           ),
-                          margin: const EdgeInsets.all(0),
-                          padding: const EdgeInsets.all(0),
-                          width: 75,
-                          height: 2,
-                        ),
-                      ],
-                    ),
-                    const Spacer(
-                      flex: 1,
-                    ),
-                  ],
+                          Container(
+                            decoration: BoxDecoration(
+                              color: discussPageSelected == 2
+                                  ? Colors.white
+                                  : const Color.fromARGB(0, 255, 255, 255),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(100)),
+                            ),
+                            margin: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.all(0),
+                            width: 75,
+                            height: 2,
+                          ),
+                        ],
+                      ),
+                      //Ended 버튼
+                      Column(
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.all(0),
+                              tapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap, //???
+                              splashFactory: NoSplash.splashFactory,
+                              primary: discussPageSelected == 3
+                                  ? Colors.white
+                                  : Color.fromARGB(100, 255, 255, 255),
+                              textStyle: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Montserrat',
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                discussPageSelected = 3;
+                              });
+                            },
+                            child: const Text("Ended"),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: discussPageSelected == 3
+                                  ? Colors.white
+                                  : const Color.fromARGB(0, 255, 255, 255),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(100)),
+                            ),
+                            margin: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.all(0),
+                            width: 75,
+                            height: 2,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               //회색 스크롤 배경
@@ -858,7 +962,7 @@ class _DiscussState extends State<Discuss> {
                         color: Color.fromARGB(25, 255, 255, 255),
                       ),
                       child: FutureBuilder(
-                        future: getDocument(),
+                        future: discussGetDocument(),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.hasData == false) {
@@ -869,7 +973,7 @@ class _DiscussState extends State<Discuss> {
                             return RefreshIndicator(
                               onRefresh: () async {
                                 setState(() {
-                                  getDocument();
+                                  discussGetDocument();
                                 });
                               },
                               child: SingleChildScrollView(
@@ -889,7 +993,8 @@ class _DiscussState extends State<Discuss> {
                                                     snapshot.data.values
                                                         .elementAt(i)?['title'],
                                                     snapshot.data.values
-                                                        .elementAt(i)?['texts'],
+                                                        .elementAt(i)?['texts']
+                                                        .replaceAll("\\n", " "),
                                                     snapshot.data.values
                                                         .elementAt(
                                                             i)?['author'],
@@ -909,7 +1014,8 @@ class _DiscussState extends State<Discuss> {
                                                     snapshot.data.values
                                                         .elementAt(i)?['title'],
                                                     snapshot.data.values
-                                                        .elementAt(i)?['texts'],
+                                                        .elementAt(i)?['texts']
+                                                        .replaceAll("\\n", " "),
                                                     snapshot.data.values
                                                         .elementAt(
                                                             i)?['author'],

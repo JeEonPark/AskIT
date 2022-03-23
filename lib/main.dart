@@ -22,6 +22,7 @@ import 'question_view_page.dart';
 import 'search_page.dart';
 import 'ask_answer_method_page.dart';
 import 'message_page.dart';
+import 'session_view_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -47,6 +48,7 @@ void main() async {
         '/search_page': (context) => SearchPage(),
         '/ask_answer_method_page': (context) => AskAnswerMethodPage(),
         '/message_page': (context) => MessagePage(),
+        '/session_view_page': (context) => SessionViewPage(),
       },
     ),
   );
