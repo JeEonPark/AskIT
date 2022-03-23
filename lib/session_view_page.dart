@@ -15,13 +15,12 @@ class SessionViewPage extends StatefulWidget {
 Future<List> getDocumnetList(String docId) async {
   List<String> lists = [];
 
-  QuerySnapshot snapshot = await FirebaseFirestore.instance
+  DocumentSnapshot snapshot = await FirebaseFirestore.instance
       .collection("DiscussPage_Sessions")
-      .where('docId', isEqualTo: docId) //끝난 페이지는 제외
+      .doc(docId)
       .get();
-  snapshot.docs.forEach((element) {
-    lists.add(element.id);
-  });
+
+  lists.add(snapshot.id);
 
   return lists;
 }
@@ -101,7 +100,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                   ),
                   FutureBuilder(
                       future: getDocument(args['docId']),
-                      builder: (context, snapshot) {
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (snapshot.hasData == false) {
                           return Text("loading");
                         } else {
@@ -115,15 +114,86 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                 children: [
                                   //제목 박스
                                   Container(
-                                    padding: EdgeInsets.fromLTRB(25, 0, 20, 0),
+                                    padding: EdgeInsets.fromLTRB(16, 0, 20, 0),
                                     child: Text(
-                                      "",
+                                      snapshot.data.values
+                                          .elementAt(0)?['title'],
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
                                         fontFamily: 'Montserrat',
                                       ),
+                                    ),
+                                  ),
+                                  //프로필
+                                  Container(
+                                    height: 100,
+                                    padding: EdgeInsets.all(25),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 1.5)),
+                                          child: Icon(Icons.person_outline,
+                                              color: Colors.white, size: 40),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            //작성자 이름+버튼
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      20, 2, 0, 0),
+                                                  child: Text(
+                                                    snapshot.data.values
+                                                        .elementAt(
+                                                            0)?['author'],
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                      fontFamily: 'Montserrat',
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 16.0,
+                                                  width: 16.0,
+                                                  child: IconButton(
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              15, 2, 0, 0),
+                                                      iconSize: 16,
+                                                      onPressed: () {},
+                                                      icon: Icon(
+                                                          Icons
+                                                              .arrow_forward_ios,
+                                                          color: Colors.white)),
+                                                ),
+                                              ],
+                                            ),
+                                            Spacer(),
+                                            //level 등급. 임시로 egg level로 고정
+                                            Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  20, 0, 0, 4),
+                                              child: Text(
+                                                "Egg level",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontFamily: 'Montserrat',
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
