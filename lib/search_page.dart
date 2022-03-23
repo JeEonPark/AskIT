@@ -31,6 +31,7 @@ class _SearchPageState extends State<SearchPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      //뒤로가기 버튼
                       IconButton(
                         onPressed: () {
                           Navigator.pop(context);
@@ -41,13 +42,14 @@ class _SearchPageState extends State<SearchPage> {
                           color: Colors.white,
                         ),
                       ),
+                      //검색바
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.7,
                         child: TextFormField(
                           controller: searchInputController,
                           focusNode: textSearchFocus,
                           style: const TextStyle(
-                              fontSize: 20, color: Colors.white),
+                              fontSize: 20, color: Colors.black),
                           decoration: InputDecoration(
                             isDense: true,
                             contentPadding:
@@ -67,6 +69,7 @@ class _SearchPageState extends State<SearchPage> {
                           ),
                         ),
                       ),
+                      //검색 버튼
                       IconButton(
                         onPressed: () {
                           Navigator.pop(context);
