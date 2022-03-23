@@ -12,6 +12,19 @@ class QuestionViewPage extends StatefulWidget {
   State<QuestionViewPage> createState() => _QuestionViewPageState();
 }
 
+//uid로 닉네임 불러오기
+Future<String> getUsernamebyUid(String uid) async {
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("UserInformation")
+      .where(
+        'uid',
+        isEqualTo: uid,
+      )
+      .get();
+
+  return snapshot.docs.elementAt(0)["username"];
+}
+
 //My Answer 최우선, 나머지 답변들
 Future<List> chatRoomList(String questionDocId) async {
   List result = [];
@@ -42,11 +55,21 @@ Future<List> chatRoomList(String questionDocId) async {
   return result;
 }
 
-//Map<채팅방 uid, 마지막 채팅>
-Future<Map> mapChatroomUidChat(String questionDocId) async {
+//Map<채팅방 uid, Map<답변자 닉네임, 마지막 채팅>>
+Future<Map<String, Map>> mapChatroomUidChat(String questionDocId) async {
   List list = await chatRoomList(questionDocId);
-  Map map = {};
-  list.forEach((element) async {
+  Map<String, Map> map = {};
+  for (var element in list) {
+    //답변자 닉네임
+    DocumentSnapshot<Map<String, dynamic>> docSnapshot = await FirebaseFirestore
+        .instance
+        .collection('AskPage_Questions')
+        .doc(questionDocId)
+        .collection("ChatRoom")
+        .doc(element)
+        .get();
+    String username = await getUsernamebyUid(docSnapshot.get("replier"));
+    //마지막 채팅
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('AskPage_Questions')
         .doc(questionDocId)
@@ -55,8 +78,12 @@ Future<Map> mapChatroomUidChat(String questionDocId) async {
         .collection("Messages")
         .orderBy('date', descending: true)
         .get();
-    map[element] = snapshot.docs.first.get("texts");
-  });
+    Map usernameChat = {};
+    usernameChat["userUid"] = docSnapshot.get("replier");
+    usernameChat["username"] = username;
+    usernameChat["texts"] = snapshot.docs.elementAt(0).get("texts");
+    map[element] = usernameChat;
+  }
 
   print(map);
   return map;
@@ -81,7 +108,6 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
-    mapChatroomUidChat(args['docId']);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -169,97 +195,53 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // 내 답변
-                                Container(
-                                  height: 70,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.86,
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(255, 127, 116, 255),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 15),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "My Answer",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: "Montserrat",
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            "So did you understand my answer?",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: "Montserrat",
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(width: 15),
-                                    ],
-                                  ),
-                                ),
-                                //하단 구분선
-                                SizedBox(height: 14),
-                                Container(
-                                  height: 1,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(height: 14),
-                                // 타인 답변
-                                Container(
-                                  height: 70,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.86,
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(255, 80, 87, 152),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 15),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Severus",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: "Montserrat",
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            "umm. okay",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: "Montserrat",
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(width: 15),
-                                    ],
-                                  ),
-                                ),
+                                FutureBuilder(
+                                    future: mapChatroomUidChat(args['docId']),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot snapshot) {
+                                      if (snapshot.hasData == false) {
+                                        return Text("loading");
+                                      } else {
+                                        Map snapshotMap = snapshot.data;
+                                        print(snapshotMap);
+                                        return Column(
+                                          children: [
+                                            for (int i = 0;
+                                                i < snapshotMap.length;
+                                                i++)
+                                              if (i == 0 &&
+                                                  snapshotMap.values
+                                                          .first["userUid"] ==
+                                                      FirebaseAuth.instance
+                                                          .currentUser?.uid)
+                                                Column(
+                                                  children: [
+                                                    myAnswer(snapshotMap
+                                                        .values.first["texts"]),
+                                                    SizedBox(height: 12),
+                                                    Container(
+                                                        height: 1,
+                                                        color: Colors.white),
+                                                    SizedBox(height: 12),
+                                                  ],
+                                                )
+                                              else
+                                                Column(
+                                                  children: [
+                                                    othersAnswer(
+                                                        snapshotMap.values
+                                                            .elementAt(
+                                                                i)["username"],
+                                                        snapshotMap.values
+                                                            .elementAt(
+                                                                i)["texts"]),
+                                                    SizedBox(height: 12)
+                                                  ],
+                                                )
+                                          ],
+                                        );
+                                      }
+                                    }),
                               ],
                             ),
                           ],
@@ -304,4 +286,92 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
       ),
     );
   }
+}
+
+Widget myAnswer(String texts) {
+  return Container(
+    height: 70,
+    width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext)
+            .size
+            .width *
+        0.86,
+    decoration: BoxDecoration(
+      color: Color.fromARGB(255, 127, 116, 255),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Row(
+      children: [
+        SizedBox(width: 15),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "My Answer",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Montserrat",
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(height: 5),
+            Text(
+              texts,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Montserrat",
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(width: 15),
+      ],
+    ),
+  );
+}
+
+Widget othersAnswer(String username, String texts) {
+  return Container(
+    height: 70,
+    width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext)
+            .size
+            .width *
+        0.86,
+    decoration: BoxDecoration(
+      color: Color.fromARGB(255, 80, 87, 152),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Row(
+      children: [
+        SizedBox(width: 15),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              username,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Montserrat",
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(height: 5),
+            Text(
+              texts,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Montserrat",
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(width: 15),
+      ],
+    ),
+  );
 }
