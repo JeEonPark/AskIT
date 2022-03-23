@@ -14,7 +14,7 @@ import 'package:ask_it/search_page.dart';
 import 'package:ask_it/ask_answer_method_page.dart';
 import 'package:ask_it/message_page.dart';
 
-import 'ask_page.dart';
+import 'home_page.dart';
 import 'login_page.dart';
 import 'sign_up_page.dart';
 import 'add_question_page.dart';
@@ -41,7 +41,7 @@ void main() async {
       routes: {
         '/': (context) => LoginPage(),
         '/sign_up_page': (context) => SignUpPage(),
-        '/ask_page': (context) => AskPage(),
+        '/ask_page': (context) => HomePage(),
         '/add_question_page': (context) => AddQuestionPage(),
         '/question_view_page': (context) => QuestionViewPage(),
         '/search_page': (context) => SearchPage(),
