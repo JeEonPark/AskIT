@@ -117,128 +117,148 @@ class _SessionViewPageState extends State<SessionViewPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 //묶음 - 프로필 박스, 기간, 종료일(community 눌렀을 때 사라짐)
-                                if (pageSelected == 1)
-                                  Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        //제목 박스
-                                        Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(24, 0, 20, 0),
-                                          child: Text(
-                                            snapshot.data.values
-                                                .elementAt(0)?['title'],
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'Montserrat',
-                                            ),
-                                          ),
-                                        ),
-                                        //프로필 박스
-                                        Container(
-                                          height: 100,
-                                          padding: EdgeInsets.all(25),
-                                          child: Row(
-                                            children: [
-                                              //프로필 사진
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.white,
-                                                        width: 1.5)),
-                                                child: Icon(Icons.person_outline,
-                                                    color: Colors.white, size: 40),
+                                
+                                  AnimatedContainer(
+                                    duration: Duration(milliseconds: 400),
+                                    curve: Curves.easeInOut,
+                                    height: pageSelected==1 ? 200 : 0,
+                                    child: pageSelected==1 ? SingleChildScrollView(
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            //제목 박스
+                                            Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  24, 0, 20, 0),
+                                              child: Text(
+                                                snapshot.data.values
+                                                    .elementAt(0)?['title'],
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Montserrat',
+                                                ),
                                               ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                            ),
+                                            //프로필 박스
+                                            Container(
+                                              height: 100,
+                                              padding: EdgeInsets.all(25),
+                                              child: Row(
                                                 children: [
-                                                  //작성자 이름+버튼
-                                                  Row(
+                                                  //프로필 사진
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: Colors.white,
+                                                            width: 1.5)),
+                                                    child: Icon(
+                                                        Icons.person_outline,
+                                                        color: Colors.white,
+                                                        size: 40),
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
                                                     children: [
+                                                      //작성자 이름+버튼
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .fromLTRB(
+                                                                    20, 2, 0, 0),
+                                                            child: Text(
+                                                              snapshot.data.values
+                                                                      .elementAt(
+                                                                          0)?[
+                                                                  'author'],
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.white,
+                                                                fontSize: 16,
+                                                                fontFamily:
+                                                                    'Montserrat',
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 16.0,
+                                                            width: 16.0,
+                                                            child: IconButton(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .fromLTRB(
+                                                                            15,
+                                                                            2,
+                                                                            0,
+                                                                            0),
+                                                                iconSize: 16,
+                                                                onPressed: () {},
+                                                                icon: Icon(
+                                                                    Icons
+                                                                        .arrow_forward_ios,
+                                                                    color: Colors
+                                                                        .white)),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Spacer(),
+                                                      //level 등급. 임시로 egg level로 고정
                                                       Container(
                                                         padding:
                                                             EdgeInsets.fromLTRB(
-                                                                20, 2, 0, 0),
+                                                                20, 0, 0, 4),
                                                         child: Text(
-                                                          snapshot.data.values
-                                                              .elementAt(
-                                                                  0)?['author'],
+                                                          "Egg level",
                                                           style: TextStyle(
                                                             color: Colors.white,
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                             fontFamily:
                                                                 'Montserrat',
                                                           ),
                                                         ),
                                                       ),
-                                                      SizedBox(
-                                                        height: 16.0,
-                                                        width: 16.0,
-                                                        child: IconButton(
-                                                            padding:
-                                                                EdgeInsets.fromLTRB(
-                                                                    15, 2, 0, 0),
-                                                            iconSize: 16,
-                                                            onPressed: () {},
-                                                            icon: Icon(
-                                                                Icons
-                                                                    .arrow_forward_ios,
-                                                                color:
-                                                                    Colors.white)),
-                                                      ),
                                                     ],
-                                                  ),
-                                                  Spacer(),
-                                                  //level 등급. 임시로 egg level로 고정
-                                                  Container(
-                                                    padding: EdgeInsets.fromLTRB(
-                                                        20, 0, 0, 4),
-                                                    child: Text(
-                                                      "Egg level",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                        fontFamily: 'Montserrat',
-                                                      ),
-                                                    ),
                                                   ),
                                                 ],
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                        //기간 텍스트(임시로 고정)
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(24, 0, 0, 0),
-                                          child: Text(
-                                            "2022.03.06 ~ 2022.04.10",
-                                            style: TextStyle(
-                                              color: Color.fromARGB(
-                                                  153, 255, 255, 255),
-                                              fontSize: 15,
-                                              fontFamily: 'Montserrat',
                                             ),
-                                          ),
-                                        ),
-                                        //며칠 후 종료 텍스트(임시로 고정)
-                                        Container(
-                                          padding: EdgeInsets.fromLTRB(24, 5, 0, 0),
-                                          child: Text(
-                                            "ended after 3 days",
-                                            style: TextStyle(
-                                              color: Color.fromARGB(
-                                                  255, 255, 255, 255),
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'Montserrat',
+                                            //기간 텍스트(임시로 고정)
+                                            Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  24, 0, 0, 0),
+                                              child: Text(
+                                                "2022.03.06 ~ 2022.04.10",
+                                                style: TextStyle(
+                                                  color: Color.fromARGB(
+                                                      153, 255, 255, 255),
+                                                  fontSize: 15,
+                                                  fontFamily: 'Montserrat',
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 25),
-                                      ]),
+                                            //며칠 후 종료 텍스트(임시로 고정)
+                                            Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  24, 5, 0, 0),
+                                              child: Text(
+                                                "ended after 3 days",
+                                                style: TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 255, 255, 255),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Montserrat',
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 25),
+                                          ]),
+                                    ) : null,
+                                  ),
                                 Container(
                                   height: 1,
                                   width: MediaQuery.of(context).size.width,
@@ -248,7 +268,8 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                 Container(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Spacer(
                                         flex: 1,
@@ -258,11 +279,13 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                         children: [
                                           TextButton(
                                             style: TextButton.styleFrom(
-                                              padding:
-                                                  EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                              padding: EdgeInsets.fromLTRB(
+                                                  0, 15, 0, 0),
                                               tapTargetSize:
-                                                  MaterialTapTargetSize.shrinkWrap,
-                                              splashFactory: NoSplash.splashFactory,
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                              splashFactory:
+                                                  NoSplash.splashFactory,
                                               primary: pageSelected == 1
                                                   ? Colors.white
                                                   : Color.fromARGB(
@@ -285,8 +308,9 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   ? Colors.white
                                                   : const Color.fromARGB(
                                                       0, 255, 255, 255),
-                                              borderRadius: const BorderRadius.all(
-                                                  Radius.circular(100)),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(100)),
                                             ),
                                             margin: const EdgeInsets.fromLTRB(
                                                 0, 2, 0, 0),
@@ -304,11 +328,13 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                         children: [
                                           TextButton(
                                             style: TextButton.styleFrom(
-                                              padding:
-                                                  EdgeInsets.fromLTRB(0, 15, 0, 0),
-                                              tapTargetSize: MaterialTapTargetSize
-                                                  .shrinkWrap, //???
-                                              splashFactory: NoSplash.splashFactory,
+                                              padding: EdgeInsets.fromLTRB(
+                                                  0, 15, 0, 0),
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap, //???
+                                              splashFactory:
+                                                  NoSplash.splashFactory,
                                               primary: pageSelected == 2
                                                   ? Colors.white
                                                   : Color.fromARGB(
@@ -331,8 +357,9 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   ? Colors.white
                                                   : const Color.fromARGB(
                                                       0, 255, 255, 255),
-                                              borderRadius: const BorderRadius.all(
-                                                  Radius.circular(100)),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(100)),
                                             ),
                                             margin: const EdgeInsets.fromLTRB(
                                                 0, 2, 0, 0),
@@ -350,11 +377,13 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                         children: [
                                           TextButton(
                                             style: TextButton.styleFrom(
-                                              padding:
-                                                  EdgeInsets.fromLTRB(0, 15, 0, 0),
-                                              tapTargetSize: MaterialTapTargetSize
-                                                  .shrinkWrap, //???
-                                              splashFactory: NoSplash.splashFactory,
+                                              padding: EdgeInsets.fromLTRB(
+                                                  0, 15, 0, 0),
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap, //???
+                                              splashFactory:
+                                                  NoSplash.splashFactory,
                                               primary: pageSelected == 3
                                                   ? Colors.white
                                                   : Color.fromARGB(
@@ -377,8 +406,9 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   ? Colors.white
                                                   : const Color.fromARGB(
                                                       0, 255, 255, 255),
-                                              borderRadius: const BorderRadius.all(
-                                                  Radius.circular(100)),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(100)),
                                             ),
                                             margin: const EdgeInsets.fromLTRB(
                                                 0, 2, 0, 0),
@@ -402,14 +432,16 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                         children: [
                                           Container(
                                             color: Colors.blue,
-                                            margin: EdgeInsets.fromLTRB(24, 0, 20, 0),
-                                            padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                                            margin: EdgeInsets.fromLTRB(
+                                                24, 0, 20, 0),
+                                            padding: EdgeInsets.fromLTRB(
+                                                0, 0, 0, 10),
                                             child: Text(
                                               "#science #universe #earth\nYou can freely talk about your opinion. dddddddddd\nPlease join our session!\ng\ng\ng\ngg\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\nend",
                                               style: TextStyle(
                                                 height: 1.8,
-                                                color:
-                                                    Color.fromARGB(255, 255, 255, 255),
+                                                color: Color.fromARGB(
+                                                    255, 255, 255, 255),
                                                 fontSize: 15,
                                                 fontFamily: 'Montserrat',
                                               ),
