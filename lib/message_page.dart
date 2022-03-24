@@ -79,7 +79,7 @@ Future<String> getChatRoomId(String questionDocId) async {
   return snapshot.docs.elementAt(0).id;
 }
 
-// ------------=-----------------------------------------------------=-=-=
+// 채팅 스트림
 Stream chattingStream(String questionDocId) async* {
   String chatRoomId = await getChatRoomId(questionDocId);
   Stream<QuerySnapshot> snapshot = FirebaseFirestore.instance

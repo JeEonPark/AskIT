@@ -519,8 +519,8 @@ class _AskState extends State<Ask> {
                             //설정버튼
                             IconButton(
                               onPressed: () async {
-                                Navigator.pop(context);
-                                Navigator.pushNamed(context, '/');
+                                navigatorKey.currentState?.pop(context);
+                                navigatorKey.currentState?.pushNamed('/');
                                 await FirebaseAuth.instance.signOut();
                               },
                               iconSize: 35,

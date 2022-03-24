@@ -24,6 +24,7 @@ import 'search_page.dart';
 import 'ask_answer_method_page.dart';
 import 'message_page.dart';
 import 'session_view_page.dart';
+import 'others_message_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
