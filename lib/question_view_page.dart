@@ -89,20 +89,20 @@ Future<Map<String, Map>> mapChatroomUidChat(String questionDocId) async {
   return map;
 }
 
-// Future<bool> myAnswer(String questionDocId) async {
-//   QuerySnapshot snapshot = await FirebaseFirestore.instance
-//       .collection('AskPage_Questions')
-//       .doc(questionDocId)
-//       .collection("ChatRoom")
-//       .where('replier', isEqualTo: "asd")
-//       .get();
+Future<bool> ifIAnswered(String questionDocId) async {
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('AskPage_Questions')
+      .doc(questionDocId)
+      .collection("ChatRoom")
+      .where('replier', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+      .get();
 
-//   if (snapshot.docs.length == 0) {
-//     return false;
-//   }
+  if (snapshot.docs.length == 0) {
+    return false;
+  }
 
-//   return true;
-// }
+  return true;
+}
 
 class _QuestionViewPageState extends State<QuestionViewPage> {
   @override
@@ -200,10 +200,19 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                     builder: (BuildContext context,
                                         AsyncSnapshot snapshot) {
                                       if (snapshot.hasData == false) {
-                                        return Text("loading");
+                                        return Container(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "Loading...",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: "Montserrat"),
+                                          ),
+                                        );
                                       } else {
                                         Map snapshotMap = snapshot.data;
                                         print(snapshotMap);
+                                        ;
                                         return Column(
                                           children: [
                                             for (int i = 0;
@@ -254,37 +263,43 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
             ],
           ),
         ),
-        floatingActionButton: FutureBuilder<Object>(
-            future: null,
-            builder: (context, snapshot) {
-              return FloatingActionButton.extended(
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/ask_answer_method_page',
-                    arguments: {
-                      "docId": args['docId'],
-                      "title": args['title'],
-                      "texts": args['texts'],
-                      "author": args['author'],
-                    },
-                  );
-                },
-                backgroundColor: Colors.white,
-                icon: Icon(
-                  Icons.question_answer_outlined,
-                  size: 30,
-                  color: Colors.black,
-                ),
-                label: Text(
-                  'Answer this Question',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'Montserrat',
+        floatingActionButton: FutureBuilder(
+            future: ifIAnswered(args["docId"]),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              print(snapshot.data);
+              if (snapshot.data == false) {
+                return FloatingActionButton.extended(
+                  onPressed: () async {
+                    await navigatorKey.currentState?.pushNamed(
+                      '/ask_answer_method_page',
+                      arguments: {
+                        "docId": args['docId'],
+                        "title": args['title'],
+                        "texts": args['texts'],
+                        "author": args['author'],
+                        "uid": args['uid'],
+                      },
+                    );
+                    setState(() {});
+                  },
+                  backgroundColor: Colors.white,
+                  icon: Icon(
+                    Icons.question_answer_outlined,
+                    size: 30,
                     color: Colors.black,
                   ),
-                ),
-              );
+                  label: Text(
+                    'Answer this Question',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Montserrat',
+                      color: Colors.black,
+                    ),
+                  ),
+                );
+              } else {
+                return Container();
+              }
             }),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),

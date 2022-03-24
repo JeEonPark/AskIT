@@ -12,14 +12,11 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
-
-
-
 Future<List> getDocumentList(String searchData) async {
   List<String> lists = [];
   QuerySnapshot snapshot = await FirebaseFirestore.instance
       .collection("AskPage_Questions")
-      .orderBy('date', descending: true)//검색한 것만 뽑아서 가져오게 해야 함!!!
+      .orderBy('date', descending: true) //검색한 것만 뽑아서 가져오게 해야 함!!!
       .get();
   snapshot.docs.forEach((element) {
     lists.add(element.id);
@@ -45,11 +42,11 @@ Future<Map> getDocument(String searchData) async {
   return map;
 }
 
-Widget first(
-    String docId, String title, String texts, String author, DateTime date) {
+Widget first(String docId, String title, String texts, String author,
+    DateTime date, String uid) {
   return GestureDetector(
     onTap: () {
-      gotoQuestionViewPage(docId, title, texts, author, date);
+      gotoQuestionViewPage(docId, title, texts, author, date, uid);
     },
     child: Container(
       height: 150,
@@ -156,11 +153,11 @@ Widget first(
   );
 }
 
-Widget second(
-    String docId, String title, String texts, String author, DateTime date) {
+Widget second(String docId, String title, String texts, String author,
+    DateTime date, String uid) {
   return GestureDetector(
     onTap: () {
-      gotoQuestionViewPage(docId, title, texts, author, date);
+      gotoQuestionViewPage(docId, title, texts, author, date, uid);
     },
     child: Container(
       height: 150,
@@ -268,6 +265,7 @@ Widget second(
     ),
   );
 }
+
 class _SearchPageState extends State<SearchPage> {
   //변수
   final searchInputController = TextEditingController();
@@ -361,66 +359,79 @@ class _SearchPageState extends State<SearchPage> {
                                     fontFamily: 'Montserrat',
                                     fontSize: 20,
                                   ));
-                            // ignore: dead_code
-                            } else {return RefreshIndicator(
-                              onRefresh: () async {
-                                setState(() {
-                                  getDocument(searchData);
-                                });
-                              },
-                              child: SingleChildScrollView(
-                                  physics: AlwaysScrollableScrollPhysics(),
-                                  child: Column(
-                                    children: [
-                                      for (int i = 0;
-                                          i < snapshot.data.length;
-                                          i++)
-                                        i % 2 == 0
-                                            ? Column(
-                                                children: [
-                                                  if (i == 0) SizedBox(height: 5),
-                                                  first(
+                              // ignore: dead_code
+                            } else {
+                              return RefreshIndicator(
+                                  onRefresh: () async {
+                                    setState(() {
+                                      getDocument(searchData);
+                                    });
+                                  },
+                                  child: SingleChildScrollView(
+                                    physics: AlwaysScrollableScrollPhysics(),
+                                    child: Column(
+                                      children: [
+                                        for (int i = 0;
+                                            i < snapshot.data.length;
+                                            i++)
+                                          i % 2 == 0
+                                              ? Column(
+                                                  children: [
+                                                    if (i == 0)
+                                                      SizedBox(height: 5),
+                                                    first(
                                                       snapshot.data.keys
                                                           .elementAt(i),
                                                       snapshot.data.values
-                                                          .elementAt(i)?['title'],
+                                                          .elementAt(
+                                                              i)?['title'],
                                                       snapshot.data.values
-                                                          .elementAt(i)?['texts'],
+                                                          .elementAt(
+                                                              i)?['texts'],
                                                       snapshot.data.values
                                                           .elementAt(
                                                               i)?['author'],
                                                       snapshot.data.values
                                                           .elementAt(i)?['date']
-                                                          .toDate()),
-                                                  if (i ==
-                                                      snapshot.data.length - 1)
-                                                    SizedBox(height: 5),
-                                                ],
-                                              )
-                                            : Column(
-                                                children: [
-                                                  second(
+                                                          .toDate(),
+                                                      snapshot.data.values
+                                                          .elementAt(i)?['uid'],
+                                                    ),
+                                                    if (i ==
+                                                        snapshot.data.length -
+                                                            1)
+                                                      SizedBox(height: 5),
+                                                  ],
+                                                )
+                                              : Column(
+                                                  children: [
+                                                    second(
                                                       snapshot.data.keys
                                                           .elementAt(i),
                                                       snapshot.data.values
-                                                          .elementAt(i)?['title'],
+                                                          .elementAt(
+                                                              i)?['title'],
                                                       snapshot.data.values
-                                                          .elementAt(i)?['texts'],
+                                                          .elementAt(
+                                                              i)?['texts'],
                                                       snapshot.data.values
                                                           .elementAt(
                                                               i)?['author'],
                                                       snapshot.data.values
                                                           .elementAt(i)?['date']
-                                                          .toDate()),
-                                                  if (i ==
-                                                      snapshot.data.length - 1)
-                                                    SizedBox(height: 5),
-                                                ],
-                                              ),
-                                    ],
-                                  ),
-                                )
-                              );
+                                                          .toDate(),
+                                                      snapshot.data.values
+                                                          .elementAt(i)?['uid'],
+                                                    ),
+                                                    if (i ==
+                                                        snapshot.data.length -
+                                                            1)
+                                                      SizedBox(height: 5),
+                                                  ],
+                                                ),
+                                      ],
+                                    ),
+                                  ));
                             }
                           },
                         )

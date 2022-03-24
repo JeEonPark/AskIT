@@ -220,11 +220,11 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-Widget first(
-    String docId, String title, String texts, String author, DateTime date) {
+Widget first(String docId, String title, String texts, String author,
+    DateTime date, String uid) {
   return GestureDetector(
     onTap: () {
-      gotoQuestionViewPage(docId, title, texts, author, date);
+      gotoQuestionViewPage(docId, title, texts, author, date, uid);
     },
     child: Container(
       height: 150,
@@ -331,11 +331,11 @@ Widget first(
   );
 }
 
-Widget second(
-    String docId, String title, String texts, String author, DateTime date) {
+Widget second(String docId, String title, String texts, String author,
+    DateTime date, String uid) {
   return GestureDetector(
     onTap: () {
-      gotoQuestionViewPage(docId, title, texts, author, date);
+      gotoQuestionViewPage(docId, title, texts, author, date, uid);
     },
     child: Container(
       height: 150,
@@ -444,8 +444,8 @@ Widget second(
   );
 }
 
-void gotoQuestionViewPage(
-    String docId, String title, String texts, String author, DateTime date) {
+void gotoQuestionViewPage(String docId, String title, String texts,
+    String author, DateTime date, String uid) {
   print(docId);
   if (_currentIndex == 0) {
     navigatorKey.currentState?.pushNamed(
@@ -455,7 +455,8 @@ void gotoQuestionViewPage(
         "title": title,
         "texts": texts,
         "author": author,
-        "date": DateFormat('yyyy.MM.dd hh:mm').format(date)
+        "date": DateFormat('yyyy.MM.dd hh:mm').format(date),
+        "uid": uid,
       },
     );
   } else if (_currentIndex == 1) {
@@ -673,19 +674,21 @@ class _AskState extends State<Ask> {
                                               children: [
                                                 if (i == 0) SizedBox(height: 5),
                                                 first(
-                                                    snapshot.data.keys
-                                                        .elementAt(i),
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['title'],
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['texts']
-                                                        .replaceAll("\\n", " "),
-                                                    snapshot.data.values
-                                                        .elementAt(
-                                                            i)?['author'],
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['date']
-                                                        .toDate()),
+                                                  snapshot.data.keys
+                                                      .elementAt(i),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['title'],
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['texts']
+                                                      .replaceAll("\\n", " "),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['author'],
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['date']
+                                                      .toDate(),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['uid'],
+                                                ),
                                                 if (i ==
                                                     snapshot.data.length - 1)
                                                   SizedBox(height: 5),
@@ -694,19 +697,21 @@ class _AskState extends State<Ask> {
                                           : Column(
                                               children: [
                                                 second(
-                                                    snapshot.data.keys
-                                                        .elementAt(i),
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['title'],
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['texts']
-                                                        .replaceAll("\\n", " "),
-                                                    snapshot.data.values
-                                                        .elementAt(
-                                                            i)?['author'],
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['date']
-                                                        .toDate()),
+                                                  snapshot.data.keys
+                                                      .elementAt(i),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['title'],
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['texts']
+                                                      .replaceAll("\\n", " "),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['author'],
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['date']
+                                                      .toDate(),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['uid'],
+                                                ),
                                                 if (i ==
                                                     snapshot.data.length - 1)
                                                   SizedBox(height: 5),
@@ -990,19 +995,21 @@ class _DiscussState extends State<Discuss> {
                                               children: [
                                                 if (i == 0) SizedBox(height: 5),
                                                 first(
-                                                    snapshot.data.keys
-                                                        .elementAt(i),
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['title'],
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['texts']
-                                                        .replaceAll("\\n", " "),
-                                                    snapshot.data.values
-                                                        .elementAt(
-                                                            i)?['author'],
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['date']
-                                                        .toDate()),
+                                                  snapshot.data.keys
+                                                      .elementAt(i),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['title'],
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['texts']
+                                                      .replaceAll("\\n", " "),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['author'],
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['date']
+                                                      .toDate(),
+                                                  snapshot.data.values
+                                                      .elementAt(i)?['uid'],
+                                                ),
                                                 if (i ==
                                                     snapshot.data.length - 1)
                                                   SizedBox(height: 5),
@@ -1023,7 +1030,9 @@ class _DiscussState extends State<Discuss> {
                                                             i)?['author'],
                                                     snapshot.data.values
                                                         .elementAt(i)?['date']
-                                                        .toDate()),
+                                                        .toDate(),
+                                                    snapshot.data.values
+                                                        .elementAt(i)?['uid']),
                                                 if (i ==
                                                     snapshot.data.length - 1)
                                                   SizedBox(height: 5),

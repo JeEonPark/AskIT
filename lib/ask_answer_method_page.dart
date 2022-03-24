@@ -1,4 +1,6 @@
 import 'package:ask_it/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AskAnswerMethodPage extends StatefulWidget {
@@ -6,6 +8,52 @@ class AskAnswerMethodPage extends StatefulWidget {
 
   @override
   State<AskAnswerMethodPage> createState() => _AskAnswerMethodPageState();
+}
+
+//채팅방 Id 불러오기 for 답변자
+Future<String> getChatRoomId(String questionDocId) async {
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("AskPage_Questions")
+      .doc(questionDocId)
+      .collection("ChatRoom")
+      .where(
+        'replier',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
+      .get();
+
+  return snapshot.docs.elementAt(0).id;
+}
+
+//채팅방 생성
+void createChatroom(String questionDocId, Map args) async {
+  await FirebaseFirestore.instance
+      .collection('AskPage_Questions')
+      .doc(questionDocId)
+      .collection('ChatRoom')
+      .doc()
+      .set({
+        'replier': FirebaseAuth.instance.currentUser?.uid,
+      })
+      .then((value) => print("Created"))
+      .catchError((error) => print("Failed to add user: $error"));
+
+  String chatRoomId = await getChatRoomId(questionDocId);
+
+  await FirebaseFirestore.instance
+      .collection('AskPage_Questions')
+      .doc(questionDocId)
+      .collection('ChatRoom')
+      .doc(chatRoomId)
+      .collection('Messages')
+      .doc()
+      .set({
+        'texts': args["texts"],
+        'date': Timestamp.now(),
+        'sender_uid': args["uid"],
+      })
+      .then((value) => print("Created 2"))
+      .catchError((error) => print("Failed to add user: $error"));
 }
 
 class _AskAnswerMethodPageState extends State<AskAnswerMethodPage> {
@@ -78,7 +126,9 @@ class _AskAnswerMethodPageState extends State<AskAnswerMethodPage> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        print(args["uid"]);
+                        createChatroom(args["docId"], args);
                         navigatorKey.currentState?.pop();
                         navigatorKey.currentState?.pushNamed(
                           '/message_page',
