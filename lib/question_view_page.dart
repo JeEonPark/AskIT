@@ -254,34 +254,38 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.pushNamed(
-              context,
-              '/ask_answer_method_page',
-              arguments: {
-                "docId": args['docId'],
-                "title": args['title'],
-                "texts": args['texts'],
-                "author": args['author'],
-              },
-            );
-          },
-          backgroundColor: Colors.white,
-          icon: Icon(
-            Icons.question_answer_outlined,
-            size: 30,
-            color: Colors.black,
-          ),
-          label: Text(
-            'Answer this Question',
-            style: TextStyle(
-              fontSize: 18,
-              fontFamily: 'Montserrat',
-              color: Colors.black,
-            ),
-          ),
-        ),
+        floatingActionButton: FutureBuilder<Object>(
+            future: null,
+            builder: (context, snapshot) {
+              return FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/ask_answer_method_page',
+                    arguments: {
+                      "docId": args['docId'],
+                      "title": args['title'],
+                      "texts": args['texts'],
+                      "author": args['author'],
+                    },
+                  );
+                },
+                backgroundColor: Colors.white,
+                icon: Icon(
+                  Icons.question_answer_outlined,
+                  size: 30,
+                  color: Colors.black,
+                ),
+                label: Text(
+                  'Answer this Question',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Montserrat',
+                    color: Colors.black,
+                  ),
+                ),
+              );
+            }),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
