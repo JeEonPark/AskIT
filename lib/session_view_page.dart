@@ -119,7 +119,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                 //묶음 - 프로필 박스, 기간, 종료일(community 눌렀을 때 사라짐)
                                 
                                   AnimatedContainer(
-                                    duration: Duration(milliseconds: 400),
+                                    duration: Duration(milliseconds: 250),
                                     curve: Curves.easeInOut,
                                     height: pageSelected==1 ? 200 : 0,
                                     child: pageSelected==1 ? SingleChildScrollView(
