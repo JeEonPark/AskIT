@@ -859,11 +859,12 @@ class _DiscussState extends State<Discuss> {
                             ),
                             margin: const EdgeInsets.all(0),
                             padding: const EdgeInsets.all(0),
-                            width: 75,
+                            width: 50,
                             height: 2,
                           ),
                         ],
                       ),
+                      SizedBox(width: 30),
                       //Joined 버튼
                       Column(
                         children: [
@@ -899,11 +900,12 @@ class _DiscussState extends State<Discuss> {
                             ),
                             margin: const EdgeInsets.all(0),
                             padding: const EdgeInsets.all(0),
-                            width: 75,
+                            width: 50,
                             height: 2,
                           ),
                         ],
                       ),
+                      SizedBox(width: 30),
                       //Ended 버튼
                       Column(
                         children: [
@@ -939,7 +941,7 @@ class _DiscussState extends State<Discuss> {
                             ),
                             margin: const EdgeInsets.all(0),
                             padding: const EdgeInsets.all(0),
-                            width: 75,
+                            width: 50,
                             height: 2,
                           ),
                         ],
