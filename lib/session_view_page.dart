@@ -53,7 +53,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
         backgroundColor: const Color.fromARGB(255, 29, 30, 37),
         body: SafeArea(
           //앱 전체 감싸는 div
-          child: Container(
+          child: SingleChildScrollView(
             child: Column(
               children: [
                 //상단바 div
@@ -115,112 +115,133 @@ class _SessionViewPageState extends State<SessionViewPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              //제목 박스
-                              Container(
-                                padding: EdgeInsets.fromLTRB(24, 0, 20, 0),
-                                child: Text(
-                                  snapshot.data.values.elementAt(0)?['title'],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Montserrat',
-                                  ),
-                                ),
-                              ),
-                              //프로필 박스
-                              Container(
-                                height: 100,
-                                padding: EdgeInsets.all(25),
-                                child: Row(
-                                  children: [
-                                    //프로필 사진
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: Colors.white, width: 1.5)),
-                                      child: Icon(Icons.person_outline,
-                                          color: Colors.white, size: 40),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        //작성자 이름+버튼
-                                        Row(
+                              //묶음 - 프로필 박스, 기간, 종료일(community 눌렀을 때 사라짐)
+                              if (pageSelected != 2)
+                                Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      //제목 박스
+                                      Container(
+                                        padding:
+                                            EdgeInsets.fromLTRB(24, 0, 20, 0),
+                                        child: Text(
+                                          snapshot.data.values
+                                              .elementAt(0)?['title'],
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Montserrat',
+                                          ),
+                                        ),
+                                      ),
+                                      //프로필 박스
+                                      Container(
+                                        height: 100,
+                                        padding: EdgeInsets.all(25),
+                                        child: Row(
                                           children: [
+                                            //프로필 사진
                                             Container(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  20, 2, 0, 0),
-                                              child: Text(
-                                                snapshot.data.values
-                                                    .elementAt(0)?['author'],
-                                                style: TextStyle(
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.white,
+                                                      width: 1.5)),
+                                              child: Icon(Icons.person_outline,
                                                   color: Colors.white,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Montserrat',
-                                                ),
-                                              ),
+                                                  size: 40),
                                             ),
-                                            SizedBox(
-                                              height: 16.0,
-                                              width: 16.0,
-                                              child: IconButton(
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                //작성자 이름+버튼
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              20, 2, 0, 0),
+                                                      child: Text(
+                                                        snapshot.data.values
+                                                            .elementAt(
+                                                                0)?['author'],
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 16.0,
+                                                      width: 16.0,
+                                                      child: IconButton(
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  15, 2, 0, 0),
+                                                          iconSize: 16,
+                                                          onPressed: () {},
+                                                          icon: Icon(
+                                                              Icons
+                                                                  .arrow_forward_ios,
+                                                              color: Colors
+                                                                  .white)),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                //level 등급. 임시로 egg level로 고정
+                                                Container(
                                                   padding: EdgeInsets.fromLTRB(
-                                                      15, 2, 0, 0),
-                                                  iconSize: 16,
-                                                  onPressed: () {},
-                                                  icon: Icon(
-                                                      Icons.arrow_forward_ios,
-                                                      color: Colors.white)),
+                                                      20, 0, 0, 4),
+                                                  child: Text(
+                                                    "Egg level",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontFamily: 'Montserrat',
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                        Spacer(),
-                                        //level 등급. 임시로 egg level로 고정
-                                        Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(20, 0, 0, 4),
-                                          child: Text(
-                                            "Egg level",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontFamily: 'Montserrat',
-                                            ),
+                                      ),
+                                      //기간 텍스트(임시로 고정)
+                                      Container(
+                                        padding:
+                                            EdgeInsets.fromLTRB(24, 0, 0, 0),
+                                        child: Text(
+                                          "2022.03.06 ~ 2022.04.10",
+                                          style: TextStyle(
+                                            color: Color.fromARGB(
+                                                153, 255, 255, 255),
+                                            fontSize: 15,
+                                            fontFamily: 'Montserrat',
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              //기간 텍스트(임시로 고정)
-                              Container(
-                                padding: EdgeInsets.fromLTRB(24, 0, 0, 0),
-                                child: Text(
-                                  "2022.03.06 ~ 2022.04.10",
-                                  style: TextStyle(
-                                    color: Color.fromARGB(153, 255, 255, 255),
-                                    fontSize: 15,
-                                    fontFamily: 'Montserrat',
-                                  ),
-                                ),
-                              ),
-                              //며칠 후 종료 텍스트(임시로 고정)
-                              Container(
-                                padding: EdgeInsets.fromLTRB(24, 5, 0, 0),
-                                child: Text(
-                                  "ended after 3 days",
-                                  style: TextStyle(
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Montserrat',
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 35),
+                                      ),
+                                      //며칠 후 종료 텍스트(임시로 고정)
+                                      Container(
+                                        padding:
+                                            EdgeInsets.fromLTRB(24, 5, 0, 0),
+                                        child: Text(
+                                          "ended after 3 days",
+                                          style: TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 255, 255, 255),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Montserrat',
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 25),
+                                    ]),
                               Container(
                                 height: 1,
                                 width: MediaQuery.of(context).size.width,
@@ -380,18 +401,42 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                   ],
                                 ),
                               ),
+                              // 선택바 아래
+                              SizedBox(height: 15),
+                              //Contents 내용
+                              SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      color: Colors.blue,
+                                      margin: EdgeInsets.fromLTRB(24, 0, 20, 0),
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                                      child: Text(
+                                        "#science #universe #earth\nYou can freely talk about your opinion. dddddddddd\nPlease join our session!\ng\ng\ng\ngg\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\ng\nend",
+                                        style: TextStyle(
+                                          height: 1.8,
+                                          color: Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          fontSize: 15,
+                                          fontFamily: 'Montserrat',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         );
                       }
                     }),
-                    
               ],
             ),
           ),
         ),
         //하단바(host 포함해서 join된 사람들은 보이지 않아야 함)
         bottomNavigationBar: Container(
+          color: Color.fromARGB(255, 29, 30, 37),
           height: 60,
           child: Column(
             children: [
