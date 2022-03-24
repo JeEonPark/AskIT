@@ -202,7 +202,16 @@ class _MessagePageState extends State<MessagePage> {
                           if (streamsnapshot.connectionState ==
                               ConnectionState.waiting) {
                             //데이터 받아오는중
-                            return Text("Loading");
+                            return Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Loading...",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                ),
+                              ),
+                            );
                           } else {
                             // Map snapshotMap = snapshot.data as Map;
                             return FutureBuilder(
@@ -210,7 +219,16 @@ class _MessagePageState extends State<MessagePage> {
                                 builder: (BuildContext context,
                                     AsyncSnapshot snapshot) {
                                   if (snapshot.hasData == false) {
-                                    return Text("Loading");
+                                    return Container(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Loading...",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: "Montserrat",
+                                        ),
+                                      ),
+                                    );
                                   } else {
                                     Map snapshotMap = snapshot.data;
                                     return SingleChildScrollView(

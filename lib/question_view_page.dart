@@ -225,8 +225,11 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                                           .currentUser?.uid)
                                                 Column(
                                                   children: [
-                                                    myAnswer(snapshotMap
-                                                        .values.first["texts"]),
+                                                    myAnswer(
+                                                        snapshotMap.values
+                                                            .first["texts"],
+                                                        args,
+                                                        snapshotMap.keys.first),
                                                     SizedBox(height: 12),
                                                     Container(
                                                         height: 1,
@@ -238,12 +241,16 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                                 Column(
                                                   children: [
                                                     othersAnswer(
-                                                        snapshotMap.values
-                                                            .elementAt(
-                                                                i)["username"],
-                                                        snapshotMap.values
-                                                            .elementAt(
-                                                                i)["texts"]),
+                                                      snapshotMap.values
+                                                          .elementAt(
+                                                              i)["username"],
+                                                      snapshotMap.values
+                                                          .elementAt(
+                                                              i)["texts"],
+                                                      args,
+                                                      snapshotMap.keys
+                                                          .elementAt(i),
+                                                    ),
                                                     SizedBox(height: 12)
                                                   ],
                                                 )
@@ -267,7 +274,8 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
             future: ifIAnswered(args["docId"]),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               print(snapshot.data);
-              if (snapshot.data == false) {
+              if (snapshot.data == false &&
+                  args["uid"] != FirebaseAuth.instance.currentUser?.uid) {
                 return FloatingActionButton.extended(
                   onPressed: () async {
                     await navigatorKey.currentState?.pushNamed(
@@ -307,90 +315,123 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
   }
 }
 
-Widget myAnswer(String texts) {
-  return Container(
-    height: 70,
-    width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext)
-            .size
-            .width *
-        0.86,
-    decoration: BoxDecoration(
-      color: Color.fromARGB(255, 127, 116, 255),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Row(
-      children: [
-        SizedBox(width: 15),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "My Answer",
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Montserrat",
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+Widget myAnswer(String texts, Map args, String chatRoomUid) {
+  return GestureDetector(
+    onTap: () async {
+      await navigatorKey.currentState?.pushNamed(
+        '/message_page',
+        arguments: {
+          "docId": args['docId'],
+          "title": args['title'],
+          "texts": args['texts'],
+          "author": args['author'],
+          "uid": args['uid'],
+          "my": "true",
+          "chatRoomUid": "chatRoomUid",
+        },
+      );
+    },
+    child: Container(
+      height: 70,
+      width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext)
+              .size
+              .width *
+          0.86,
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 127, 116, 255),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "My Answer",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: "Montserrat",
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              texts,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Montserrat",
-                fontSize: 14,
+              SizedBox(height: 5),
+              Text(
+                texts,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: "Montserrat",
+                  fontSize: 14,
+                ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(width: 15),
-      ],
+            ],
+          ),
+          SizedBox(width: 15),
+        ],
+      ),
     ),
   );
 }
 
-Widget othersAnswer(String username, String texts) {
-  return Container(
-    height: 70,
-    width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext)
-            .size
-            .width *
-        0.86,
-    decoration: BoxDecoration(
-      color: Color.fromARGB(255, 80, 87, 152),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Row(
-      children: [
-        SizedBox(width: 15),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              username,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Montserrat",
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+Widget othersAnswer(
+    String username, String texts, Map args, String chatRoomUid) {
+  return GestureDetector(
+    onTap: () async {
+      await navigatorKey.currentState?.pushNamed(
+        '/others_message_page',
+        arguments: {
+          "docId": args['docId'],
+          "title": args['title'],
+          "texts": args['texts'],
+          "author": args['author'],
+          "uid": args['uid'],
+          "my": "false",
+          "chatRoomUid": chatRoomUid,
+        },
+      );
+    },
+    child: Container(
+      height: 70,
+      width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext)
+              .size
+              .width *
+          0.86,
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 80, 87, 152),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                username,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: "Montserrat",
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              texts,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Montserrat",
-                fontSize: 14,
+              SizedBox(height: 5),
+              Text(
+                texts,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: "Montserrat",
+                  fontSize: 14,
+                ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(width: 15),
-      ],
+            ],
+          ),
+          SizedBox(width: 15),
+        ],
+      ),
     ),
   );
 }
