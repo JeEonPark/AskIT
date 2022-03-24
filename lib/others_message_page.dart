@@ -8,6 +8,26 @@ class OthersMessagePage extends StatefulWidget {
 
   @override
   State<OthersMessagePage> createState() => _OthersMessagePageState();
+  FocusNode textFocus = FocusNode();
+}
+
+//내 채팅 입력
+void writeChatting(
+    String questionDocId, String texts, String chatRoomId) async {
+  await FirebaseFirestore.instance
+      .collection('AskPage_Questions')
+      .doc(questionDocId)
+      .collection('ChatRoom')
+      .doc(chatRoomId)
+      .collection('Messages')
+      .doc()
+      .set({
+        'texts': texts,
+        'date': Timestamp.now(),
+        'sender_uid': FirebaseAuth.instance.currentUser?.uid,
+      })
+      .then((value) => print("Sent"))
+      .catchError((error) => print("Failed to add user: $error"));
 }
 
 // 채팅 스트림
@@ -113,6 +133,7 @@ Future<String> getUsernamebyUid(String uid) async {
 }
 
 class _OthersMessagePageState extends State<OthersMessagePage> {
+  final textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -244,20 +265,91 @@ class _OthersMessagePageState extends State<OthersMessagePage> {
                   ),
                 ),
                 //하단바
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      "Read Only",
-                      style: TextStyle(
-                        fontFamily: "Montserrat",
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                child: args["uid"] == FirebaseAuth.instance.currentUser?.uid
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (args["uid"] ==
+                              FirebaseAuth.instance.currentUser?.uid)
+                            SizedBox(
+                              width: 10,
+                            ),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            splashRadius: 25,
+                            iconSize: 30,
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.photo_camera_outlined,
+                              color: Colors.white,
+                            ),
+                          ),
+                          //메시지 입력창
+                          Spacer(),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.7,
+                            child: TextFormField(
+                              controller: textController,
+                              focusNode: widget.textFocus,
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding:
+                                    const EdgeInsets.fromLTRB(14, 8, 14, 8),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                fillColor: Colors.white,
+                                filled: true,
+                                hintText: "Search",
+                                hintStyle: const TextStyle(
+                                  color: Color.fromARGB(255, 125, 125, 125),
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Spacer(),
+                          Row(
+                            children: [
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                splashRadius: 25,
+                                iconSize: 30,
+                                onPressed: () {
+                                  writeChatting(args['docId'],
+                                      textController.text, args['chatRoomUid']);
+                                  textController.clear();
+                                },
+                                icon: Icon(
+                                  Icons.send_outlined,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Read Only",
+                            style: TextStyle(
+                              fontFamily: "Montserrat",
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
             ],
           ),

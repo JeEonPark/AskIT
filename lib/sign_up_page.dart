@@ -210,6 +210,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   .set({
                                     'email': emailInputController.text,
                                     'username': usernameInputController.text,
+                                    'uid': userCredential.user!.uid,
                                   })
                                   .then((value) => print("User Added"))
                                   .catchError((error) =>

@@ -281,6 +281,7 @@ class _MessagePageState extends State<MessagePage> {
                   ),
                   //하단바
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(
                         width: 10,
