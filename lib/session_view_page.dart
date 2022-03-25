@@ -470,7 +470,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                     // 선택바 아래
                                     SizedBox(height: 15),
                                     if (pageSelected == 1)
-                                      // Contents
+                                      // Contents 화면
                                       Expanded(
                                         child: Container(
                                           child: SingleChildScrollView(
@@ -501,7 +501,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                         ),
                                       ),
                                     if (pageSelected == 2)
-                                    //Community 화면
+                                      //Community 화면
                                       Expanded(
                                         child: Center(
                                           child: Text(
@@ -516,10 +516,26 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                           ),
                                         ),
                                       ),
+                                    if (pageSelected == 3)
+                                      //Live 화면
+                                      Expanded(
+                                        child: Center(
+                                          child: Text(
+                                            "Live",
+                                            style: TextStyle(
+                                              height: 1.8,
+                                              color: Color.fromARGB(
+                                                  255, 255, 255, 255),
+                                              fontSize: 15,
+                                              fontFamily: 'Montserrat',
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
-                              //하단바(host 포함해서 join된 사람들은 보이지 않아야 함)
+                              //하단바
                               Container(
                                 color: Color.fromARGB(255, 29, 30, 37),
                                 height: 60,
@@ -541,20 +557,33 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                               splashRadius: 40,
                                               iconSize: 35,
                                               padding: EdgeInsets.all(0),
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                setState(() {
+                                                  //안눌렀으면 liked에서 내 이름 넣기
+                                                  //이미 눌렀으면 liked에서 내 이름 빼기
+                                                });
+                                              },
                                               icon: Icon(
                                                 Icons.favorite,
-                                                color: Color.fromARGB(
-                                                    255, 206, 55, 55),
+                                                color: (!snapshot.data.values
+                                                      .elementAt(0)['liked']
+                                                      .contains(FirebaseAuth
+                                                          .instance
+                                                          .currentUser
+                                                          ?.uid)) ? Color.fromARGB(
+                                                    255, 206, 55, 55) : Colors.white,
                                               ),
                                             ),
                                           ),
-                                          //좋아요 수(나중에 liked array length로 넣기)
+                                          //좋아요 수
                                           Container(
                                             padding: EdgeInsets.fromLTRB(
                                                 10, 0, 0, 0),
                                             child: Text(
-                                              "16",
+                                              snapshot.data.values
+                                                  .elementAt(0)['liked']
+                                                  .length
+                                                  .toString(),
                                               style: TextStyle(
                                                 color: Color.fromARGB(
                                                     255, 255, 255, 255),
@@ -563,7 +592,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                               ),
                                             ),
                                           ),
-                                          //Join this session 버튼
+                                          //Join this session 버튼(join 누르면 joined 리스트에 내가 추가됨. join 안했으면 반대)
                                           Container(
                                             padding: EdgeInsets.fromLTRB(
                                                 20, 0, 0, 0),
@@ -576,20 +605,50 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   borderRadius:
                                                       BorderRadius.circular(20),
                                                 ),
-                                                primary: Colors.white,
+                                                primary: (!snapshot.data.values
+                                                      .elementAt(0)['joined']
+                                                      .contains(FirebaseAuth
+                                                          .instance
+                                                          .currentUser
+                                                          ?.uid)) ? Colors.white : Color.fromARGB(255, 108, 103, 103),
                                               ),
                                               icon: Icon(
                                                 Icons.question_answer,
-                                                color: Colors.black,
+                                                color: (!snapshot.data.values
+                                                        .elementAt(0)['joined']
+                                                        .contains(FirebaseAuth
+                                                            .instance
+                                                            .currentUser
+                                                            ?.uid))
+                                                    ? Colors.black
+                                                    : Color.fromARGB(
+                                                        127, 255, 255, 255),
                                               ),
-                                              label: Text(
-                                                "Join this Session",
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontFamily: 'Montserrat',
-                                                ),
-                                              ),
+                                              label: (!snapshot.data.values
+                                                      .elementAt(0)['joined']
+                                                      .contains(FirebaseAuth
+                                                          .instance
+                                                          .currentUser
+                                                          ?.uid))
+                                                  ? Text(
+                                                      "Join this Session",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 18,
+                                                        fontFamily:
+                                                            'Montserrat',
+                                                      ),
+                                                    )
+                                                  : Text(
+                                                      "Leave this Session",
+                                                      style: TextStyle(
+                                                        color: Color.fromARGB(
+                                                            127, 255, 255, 255),
+                                                        fontSize: 18,
+                                                        fontFamily:
+                                                            'Montserrat',
+                                                      ),
+                                                    ),
                                             ),
                                           ),
                                         ],
