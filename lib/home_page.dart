@@ -6,17 +6,22 @@ import 'package:intl/intl.dart';
 import 'main.dart';
 import 'package:ask_it/main.dart';
 
-//전역변수
 //안녕하세요
 //박무바보
+
+//전역변수
+//#region 변수
 int askPageSelected = 1;
 int discussPageSelected = 1;
 int _currentIndex = 0;
+//#endregion
 
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
+//#region 함수
 
 // void readdata() async {
 //   List<String> lists = [];
@@ -149,6 +154,10 @@ Future<Map> discussGetDocument() async {
   return map;
 }
 
+//#endregion
+
+//#region 메인 homePage Class
+
 class _HomePageState extends State<HomePage> {
   //변수들
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -219,6 +228,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+//#endregion
+
+//#region first, second 함수
 
 Widget first(String docId, String title, String texts, String author,
     DateTime date, String uid) {
@@ -446,6 +459,9 @@ Widget second(String docId, String title, String texts, String author,
   );
 }
 
+//#endregion
+
+//#region gotoQuestionViewPage 함수
 Future gotoQuestionViewPage(String docId, String title, String texts,
     String author, DateTime date, String uid) async {
   if (_currentIndex == 0) {
@@ -465,6 +481,10 @@ Future gotoQuestionViewPage(String docId, String title, String texts,
         ?.pushNamed('/session_view_page', arguments: {"docId": docId});
   }
 }
+
+//#endregion
+
+//#region Ask 페이지
 
 class Ask extends StatefulWidget {
   @override
@@ -766,7 +786,9 @@ class _AskState extends State<Ask> {
   }
 }
 
-//Discuss 페이지
+//#endregion
+
+//#region Discuss 페이지
 class Discuss extends StatefulWidget {
   @override
   State<Discuss> createState() => _DiscussState();
@@ -1104,7 +1126,9 @@ class _DiscussState extends State<Discuss> {
   }
 }
 
-//Others 페이지
+//#endregion
+
+//#region Others 페이지
 class Other extends StatefulWidget {
   @override
   State<Other> createState() => _OtherState();
@@ -1116,3 +1140,4 @@ class _OtherState extends State<Other> {
     return Scaffold(body: Text("Other"));
   }
 }
+//#endregion
