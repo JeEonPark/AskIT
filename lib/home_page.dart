@@ -478,7 +478,14 @@ Future gotoQuestionViewPage(String docId, String title, String texts,
     );
   } else if (_currentIndex == 1) {
     await navigatorKey.currentState
-        ?.pushNamed('/session_view_page', arguments: {"docId": docId});
+        ?.pushNamed('/session_view_page', arguments: {
+      "docId": docId,
+      "title": title,
+      "texts": texts,
+      "author": author,
+      "date": DateFormat('yyyy.MM.dd hh:mm').format(date),
+      "uid": uid,
+    });
   }
 }
 

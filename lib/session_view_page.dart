@@ -6,15 +6,11 @@ import 'package:flutter/scheduler.dart';
 
 import 'main.dart';
 
-//double textBoxHeight = 0;
-
 class SessionViewPage extends StatefulWidget {
   SessionViewPage({Key? key}) : super(key: key);
 
   @override
   State<SessionViewPage> createState() => _SessionViewPageState();
-  GlobalKey _TextBoxKey = GlobalKey();
-  GlobalKey _ProfileBoxKey = GlobalKey();
 }
 
 Future<List> getDocumnetList(String docId) async {
@@ -72,6 +68,22 @@ class _SessionViewPageState extends State<SessionViewPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
+    print(args["title"]);
+    final TextPainter textPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      text: TextSpan(
+        text: args["title"],
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Montserrat',
+        ),
+      ),
+    )..layout(
+        maxWidth: MediaQuery.of(context).size.width - 44,
+      );
+    print(textPainter.size);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -155,7 +167,6 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   children: [
                                                     //제목 박스
                                                     Container(
-                                                      key: widget._TextBoxKey,
                                                       padding:
                                                           EdgeInsets.fromLTRB(
                                                               24, 0, 20, 0),
@@ -175,8 +186,6 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                     ),
                                                     //프로필 박스
                                                     Container(
-                                                      key:
-                                                          widget._ProfileBoxKey,
                                                       height: 100,
                                                       padding:
                                                           EdgeInsets.all(25),
@@ -324,7 +333,9 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   ]),
                                             )
                                           : null,
-                                      height: pageSelected == 1 ? 200 : 0,
+                                      height: pageSelected == 1
+                                          ? 200 + textPainter.size.height - 29
+                                          : 0,
                                     ),
                                     Container(
                                       height: 1,
@@ -630,10 +641,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             height: 40,
                                             width: 280,
                                             child: ElevatedButton.icon(
-                                              onPressed: () {
-                                                print(widget._TextBoxKey
-                                                    .currentContext);
-                                              },
+                                              onPressed: () {},
                                               style: ElevatedButton.styleFrom(
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
