@@ -553,8 +553,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                           //하트(안눌렀을때, 눌렀을때 색깔 변화 나중에 넣기)
                                           SizedBox(
                                             height: 35,
-                                            child: IconButton(
-                                              splashRadius: 40,
+                                            child: IconButton(splashRadius: 10,
                                               iconSize: 35,
                                               padding: EdgeInsets.all(0),
                                               onPressed: () {
@@ -566,12 +565,14 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                               icon: Icon(
                                                 Icons.favorite,
                                                 color: (!snapshot.data.values
-                                                      .elementAt(0)['liked']
-                                                      .contains(FirebaseAuth
-                                                          .instance
-                                                          .currentUser
-                                                          ?.uid)) ? Color.fromARGB(
-                                                    255, 206, 55, 55) : Colors.white,
+                                                        .elementAt(0)['liked']
+                                                        .contains(FirebaseAuth
+                                                            .instance
+                                                            .currentUser
+                                                            ?.uid))
+                                                    ? Color.fromARGB(
+                                                        255, 206, 55, 55)
+                                                    : Colors.white,
                                               ),
                                             ),
                                           ),
@@ -605,21 +606,22 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   borderRadius:
                                                       BorderRadius.circular(20),
                                                 ),
-                                                primary: (!snapshot.data.values
-                                                      .elementAt(0)['joined']
-                                                      .contains(FirebaseAuth
-                                                          .instance
-                                                          .currentUser
-                                                          ?.uid)) ? Colors.white : Color.fromARGB(255, 108, 103, 103),
+                                                primary: (snapshot.data.values
+                                                            .elementAt(
+                                                                0)['uid'] !=
+                                                        FirebaseAuth.instance
+                                                            .currentUser?.uid)
+                                                    ? Colors.white
+                                                    : Color.fromARGB(
+                                                        255, 108, 103, 103),
                                               ),
                                               icon: Icon(
                                                 Icons.question_answer,
-                                                color: (!snapshot.data.values
-                                                        .elementAt(0)['joined']
-                                                        .contains(FirebaseAuth
-                                                            .instance
-                                                            .currentUser
-                                                            ?.uid))
+                                                color: (snapshot.data.values
+                                                            .elementAt(
+                                                                0)['uid'] !=
+                                                        FirebaseAuth.instance
+                                                            .currentUser?.uid)
                                                     ? Colors.black
                                                     : Color.fromARGB(
                                                         127, 255, 255, 255),
@@ -642,8 +644,20 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   : Text(
                                                       "Leave this Session",
                                                       style: TextStyle(
-                                                        color: Color.fromARGB(
-                                                            127, 255, 255, 255),
+                                                        color: (snapshot.data.values
+                                                                        .elementAt(
+                                                                            0)[
+                                                                    'uid'] !=
+                                                                FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser
+                                                                    ?.uid)
+                                                            ? Colors.black
+                                                            : Color.fromARGB(
+                                                                127,
+                                                                255,
+                                                                255,
+                                                                255),
                                                         fontSize: 18,
                                                         fontFamily:
                                                             'Montserrat',
