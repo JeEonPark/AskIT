@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ask_it/main.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'main.dart';
+
+//double textBoxHeight = 0;
 
 class SessionViewPage extends StatefulWidget {
   SessionViewPage({Key? key}) : super(key: key);
 
   @override
   State<SessionViewPage> createState() => _SessionViewPageState();
+  GlobalKey _TextBoxKey = GlobalKey();
+  GlobalKey _ProfileBoxKey = GlobalKey();
 }
 
 Future<List> getDocumnetList(String docId) async {
@@ -44,6 +49,26 @@ Future<Map> getDocument(String docId) async {
 class _SessionViewPageState extends State<SessionViewPage> {
   //변수들
   int pageSelected = 1;
+  @override
+  // void initState() {
+  //   super.initState();
+
+  //   Future.delayed(const Duration(milliseconds: 500), () {
+  //     print(widget._TextBoxKey.currentContext);
+  //     final RenderBox renderBox1 =
+  //         widget._TextBoxKey.currentContext!.findRenderObject() as RenderBox;
+  //     final position1 = renderBox1.localToGlobal(Offset.zero);
+
+  //     final RenderBox renderBox2 =
+  //         widget._ProfileBoxKey.currentContext!.findRenderObject() as RenderBox;
+  //     final position2 = renderBox2.localToGlobal(Offset.zero);
+
+  //     navigatorKey.currentState?.setState(() {
+  //       textBoxHeight = position2.dy - position1.dy;
+  //     });
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -122,7 +147,6 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                     AnimatedContainer(
                                       duration: Duration(milliseconds: 250),
                                       curve: Curves.easeInOut,
-                                      height: pageSelected == 1 ? 200 : 0,
                                       child: pageSelected == 1
                                           ? SingleChildScrollView(
                                               child: Column(
@@ -131,6 +155,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   children: [
                                                     //제목 박스
                                                     Container(
+                                                      key: widget._TextBoxKey,
                                                       padding:
                                                           EdgeInsets.fromLTRB(
                                                               24, 0, 20, 0),
@@ -150,6 +175,8 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                     ),
                                                     //프로필 박스
                                                     Container(
+                                                      key:
+                                                          widget._ProfileBoxKey,
                                                       height: 100,
                                                       padding:
                                                           EdgeInsets.all(25),
@@ -252,6 +279,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                         ],
                                                       ),
                                                     ),
+
                                                     //기간 텍스트(임시로 고정)
                                                     Container(
                                                       padding:
@@ -296,6 +324,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   ]),
                                             )
                                           : null,
+                                      height: pageSelected == 1 ? 200 : 0,
                                     ),
                                     Container(
                                       height: 1,
@@ -553,7 +582,8 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                           //하트(안눌렀을때, 눌렀을때 색깔 변화 나중에 넣기)
                                           SizedBox(
                                             height: 35,
-                                            child: IconButton(splashRadius: 10,
+                                            child: IconButton(
+                                              splashRadius: 10,
                                               iconSize: 35,
                                               padding: EdgeInsets.all(0),
                                               onPressed: () {
@@ -600,7 +630,10 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             height: 40,
                                             width: 280,
                                             child: ElevatedButton.icon(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                print(widget._TextBoxKey
+                                                    .currentContext);
+                                              },
                                               style: ElevatedButton.styleFrom(
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:

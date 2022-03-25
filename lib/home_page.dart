@@ -217,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                   label: ('Discuss'),
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite),
+                  icon: Icon(Icons.more_horiz_rounded),
                   label: ('Others'),
                 ),
               ],
@@ -1137,7 +1137,113 @@ class Other extends StatefulWidget {
 class _OtherState extends State<Other> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Text("Other"));
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 29, 30, 37),
+      body: SafeArea(
+        child: Container(
+          child: Column(
+            children: [
+              //#region 상단 바 Container
+              Container(
+                height: 70,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      child: Text(
+                        "Others",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 30,
+                        ),
+                      ),
+                    ),
+                    Spacer(),
+                  ],
+                ),
+              ),
+              //#endregion
+              SizedBox(height: 20),
+              //#region 프로필 영역 Container
+              Container(
+                height: 200,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //프로필 사진
+                    Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: 1.5)),
+                      child: Icon(Icons.person_outline,
+                          color: Colors.white, size: 60),
+                    ),
+                    SizedBox(height: 10),
+                    //이름 레벨
+                    Text(
+                      "JeEon Park",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: "Montserrat",
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      "Egg level",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: "Montserrat",
+                        fontWeight: FontWeight.w300,
+                        fontSize: 12,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    //질문, 답변, 좋아요 수
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 100,
+                          child: Column(
+                            children: [
+                              Text("Questions"),
+                              Text("6"),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 100,
+                          child: Column(
+                            children: [
+                              Text("I Answered"),
+                              Text("12"),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 100,
+                          child: Column(
+                            children: [
+                              Text("Liked"),
+                              Text("57"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              //#endregion
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 //#endregion
