@@ -12,6 +12,14 @@ class QuestionViewPage extends StatefulWidget {
   State<QuestionViewPage> createState() => _QuestionViewPageState();
 }
 
+//글 지우기
+void deleteQuestion(String docId) async {
+  FirebaseFirestore.instance
+      .collection("AskPage_Questions")
+      .doc(docId)
+      .delete();
+}
+
 //uid로 닉네임 불러오기
 Future<String> getUsernamebyUid(String uid) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -124,14 +132,54 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                       alignment: Alignment.centerLeft,
                       width: MediaQuery.of(context).size.width,
                       height: 80,
-                      child: IconButton(
-                        padding: EdgeInsets.all(20),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.arrow_back_rounded),
-                        color: Colors.white,
-                        iconSize: 35,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            padding: EdgeInsets.all(20),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(Icons.arrow_back_rounded),
+                            color: Colors.white,
+                            iconSize: 35,
+                          ),
+                          Spacer(),
+                          if (args['uid'] ==
+                              FirebaseAuth.instance.currentUser?.uid)
+                            IconButton(
+                              padding: EdgeInsets.all(20),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      content: Text(
+                                          "Do you want to delete Question?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("No"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            deleteQuestion(args['docId']);
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("Yes, Delete"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              icon: Icon(Icons.delete_forever_outlined),
+                              color: Colors.white,
+                              iconSize: 35,
+                            ),
+                        ],
                       ),
                     ),
                     Container(

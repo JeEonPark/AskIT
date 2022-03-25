@@ -223,8 +223,9 @@ class _HomePageState extends State<HomePage> {
 Widget first(String docId, String title, String texts, String author,
     DateTime date, String uid) {
   return GestureDetector(
-    onTap: () {
-      gotoQuestionViewPage(docId, title, texts, author, date, uid);
+    onTap: () async {
+      await gotoQuestionViewPage(docId, title, texts, author, date, uid);
+      navigatorKey.currentState?.setState(() {});
     },
     child: Container(
       height: 150,
@@ -336,6 +337,7 @@ Widget second(String docId, String title, String texts, String author,
   return GestureDetector(
     onTap: () {
       gotoQuestionViewPage(docId, title, texts, author, date, uid);
+      navigatorKey.currentState?.setState(() {});
     },
     child: Container(
       height: 150,
@@ -444,11 +446,10 @@ Widget second(String docId, String title, String texts, String author,
   );
 }
 
-void gotoQuestionViewPage(String docId, String title, String texts,
-    String author, DateTime date, String uid) {
-  print(docId);
+Future gotoQuestionViewPage(String docId, String title, String texts,
+    String author, DateTime date, String uid) async {
   if (_currentIndex == 0) {
-    navigatorKey.currentState?.pushNamed(
+    await navigatorKey.currentState?.pushNamed(
       '/question_view_page',
       arguments: {
         "docId": docId,
@@ -460,7 +461,7 @@ void gotoQuestionViewPage(String docId, String title, String texts,
       },
     );
   } else if (_currentIndex == 1) {
-    navigatorKey.currentState
+    await navigatorKey.currentState
         ?.pushNamed('/session_view_page', arguments: {"docId": docId});
   }
 }
@@ -471,6 +472,7 @@ class Ask extends StatefulWidget {
 }
 
 class _AskState extends State<Ask> {
+  bool loading = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -566,6 +568,7 @@ class _AskState extends State<Ask> {
                           onPressed: () {
                             setState(() {
                               askPageSelected = 1;
+                              loading = true;
                             });
                           },
                           child: const Text("My Question"),
@@ -609,6 +612,7 @@ class _AskState extends State<Ask> {
                           onPressed: () {
                             setState(() {
                               askPageSelected = 2;
+                              loading = true;
                             });
                           },
                           child: const Text("Others Question"),
@@ -651,11 +655,23 @@ class _AskState extends State<Ask> {
                         future: askGetDocument(),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasData == false) {
+                          if (snapshot.hasData == false || loading == true) {
                             //데이터 받아오는중
-                            return Text("loading");
+                            loading = false;
+                            return Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Loading...",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                  fontSize: 16,
+                                ),
+                              ),
+                            );
                           } else {
                             //데이터 다 받아옴
+                            loading = false;
                             return RefreshIndicator(
                               onRefresh: () async {
                                 setState(() {
@@ -734,9 +750,10 @@ class _AskState extends State<Ask> {
       ),
       //플로팅 액션 버튼
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           // Add your onPressed code here!
-          navigatorKey.currentState?.pushNamed('/add_question_page');
+          await navigatorKey.currentState?.pushNamed('/add_question_page');
+          setState(() {});
         },
         backgroundColor: Colors.white,
         child: const Icon(
@@ -756,6 +773,7 @@ class Discuss extends StatefulWidget {
 }
 
 class _DiscussState extends State<Discuss> {
+  bool loading = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -791,9 +809,10 @@ class _DiscussState extends State<Discuss> {
                           children: [
                             //검색버튼
                             IconButton(
-                              onPressed: () {
-                                navigatorKey.currentState
+                              onPressed: () async {
+                                await navigatorKey.currentState
                                     ?.pushNamed('/search_page');
+                                setState(() {});
                               },
                               iconSize: 35,
                               icon: const Icon(
@@ -849,6 +868,7 @@ class _DiscussState extends State<Discuss> {
                             ),
                             onPressed: () {
                               setState(() {
+                                loading = true;
                                 discussPageSelected = 1;
                               });
                             },
@@ -890,6 +910,7 @@ class _DiscussState extends State<Discuss> {
                             ),
                             onPressed: () {
                               setState(() {
+                                loading = true;
                                 discussPageSelected = 2;
                               });
                             },
@@ -931,6 +952,7 @@ class _DiscussState extends State<Discuss> {
                             ),
                             onPressed: () {
                               setState(() {
+                                loading = true;
                                 discussPageSelected = 3;
                               });
                             },
@@ -972,9 +994,20 @@ class _DiscussState extends State<Discuss> {
                         future: discussGetDocument(),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasData == false) {
+                          if (snapshot.hasData == false || loading == true) {
                             //데이터 받아오는중
-                            return Text("loading");
+                            loading = false;
+                            return Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Loading...",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                  fontSize: 16,
+                                ),
+                              ),
+                            );
                           } else {
                             //데이터 다 받아옴
                             return RefreshIndicator(
@@ -1055,9 +1088,10 @@ class _DiscussState extends State<Discuss> {
       ),
       //플로팅 액션 버튼
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           // Add your onPressed code here!
-          navigatorKey.currentState?.pushNamed('/add_question_page');
+          await navigatorKey.currentState?.pushNamed('/add_question_page');
+          setState(() {});
         },
         backgroundColor: Colors.white,
         child: const Icon(
