@@ -85,8 +85,6 @@ Future<Map<String, Map>> mapChatroomUidChat(String questionDocId) async {
     usernameChat["texts"] = snapshot.docs.elementAt(0).get("texts");
     map[element] = usernameChat;
   }
-
-  print(map);
   return map;
 }
 
@@ -247,7 +245,6 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                         );
                                       } else {
                                         Map snapshotMap = snapshot.data;
-                                        print(snapshotMap);
                                         ;
                                         return Column(
                                           children: [
@@ -295,7 +292,6 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
         floatingActionButton: FutureBuilder(
             future: ifIAnswered(args["docId"]),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              print(snapshot.data);
               if (snapshot.data == false && args["uid"] != FirebaseAuth.instance.currentUser?.uid) {
                 return FloatingActionButton.extended(
                   onPressed: () async {

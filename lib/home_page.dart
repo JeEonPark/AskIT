@@ -23,20 +23,42 @@ class HomePage extends StatefulWidget {
 
 //#region 함수
 
-// void readdata() async {
-//   List<String> lists = [];
-//   QuerySnapshot snapshot = await await FirebaseFirestore.instance
-//       .collection("AskPage_Questions")
-//       .get();
-//   List<dynamic> result = snapshot.docs.map((doc) => doc.data()).toList();
-//   print("aaaaa" + result.toString());
-//   print(result[0]["texts"]);
+//내가 답변한 글 리스트 불러오기
+Future<List> getAnsweredDocumentList() async {
+  List<String> lists = [];
 
-//   // final usercol = await FirebaseFirestore.instance
-//   //     .collection("AskPage_Questions")
-//   //     .doc("9qK7py72Pd3CdfvrQBxe");
-//   // usercol.get().then((value) => {print(value.data())});
-// }
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collectionGroup("ChatRoom")
+      .where(
+        'replier',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
+      .get();
+
+  snapshot.docs.forEach((element) {
+    lists.add(element.reference.parent.parent!.id);
+  });
+
+  return lists;
+}
+
+//내 글 리스트 불러오기
+Future<List> getDocumentList() async {
+  List<String> lists = [];
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("AskPage_Questions")
+      .orderBy('date', descending: true)
+      .where(
+        'uid',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
+      .get();
+  snapshot.docs.forEach((element) {
+    lists.add(element.id);
+  });
+
+  return lists;
+}
 
 Future<List> askGetDocumnetList() async {
   List<String> lists = [];
@@ -1135,7 +1157,7 @@ class _OtherState extends State<Other> {
                             width: 100,
                             child: Column(
                               children: [
-                                Text(
+                                const Text(
                                   "Questions",
                                   style: TextStyle(
                                     color: Colors.white,
@@ -1145,15 +1167,31 @@ class _OtherState extends State<Other> {
                                   ),
                                 ),
                                 SizedBox(height: 6),
-                                Text(
-                                  "6",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: "Montserrat",
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                FutureBuilder<Object>(
+                                    future: getDocumentList(),
+                                    builder: (context, AsyncSnapshot snapshot) {
+                                      if (snapshot.hasData == false) {
+                                        return const Text(
+                                          "-",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "Montserrat",
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                          ),
+                                        );
+                                      } else {
+                                        return Text(
+                                          snapshot.data.length.toString(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "Montserrat",
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                          ),
+                                        );
+                                      }
+                                    }),
                               ],
                             ),
                           ),
@@ -1168,7 +1206,7 @@ class _OtherState extends State<Other> {
                             width: 100,
                             child: Column(
                               children: [
-                                Text(
+                                const Text(
                                   "I Answered",
                                   style: TextStyle(
                                     color: Colors.white,
@@ -1178,15 +1216,31 @@ class _OtherState extends State<Other> {
                                   ),
                                 ),
                                 SizedBox(height: 6),
-                                Text(
-                                  "12",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: "Montserrat",
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                FutureBuilder<Object>(
+                                    future: getAnsweredDocumentList(),
+                                    builder: (context, AsyncSnapshot snapshot) {
+                                      if (snapshot.hasData == false) {
+                                        return const Text(
+                                          "-",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "Montserrat",
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                          ),
+                                        );
+                                      } else {
+                                        return Text(
+                                          snapshot.data.length.toString(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "Montserrat",
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                          ),
+                                        );
+                                      }
+                                    }),
                               ],
                             ),
                           ),

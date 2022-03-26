@@ -127,7 +127,6 @@ class _AskAnswerMethodPageState extends State<AskAnswerMethodPage> {
                         ),
                       ),
                       onPressed: () async {
-                        print(args["uid"]);
                         createChatroom(args["docId"], args);
                         navigatorKey.currentState?.pop();
                         navigatorKey.currentState?.pushNamed(

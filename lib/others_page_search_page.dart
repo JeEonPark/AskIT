@@ -16,6 +16,25 @@ class OthersPageSearchPage extends StatefulWidget {
 }
 
 //#region Firebase 함수
+//내가 답변한 글 리스트 불러오기
+Future<List> getAnsweredDocumentList() async {
+  List<String> lists = [];
+
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collectionGroup("ChatRoom")
+      .where(
+        'replier',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
+      .get();
+
+  snapshot.docs.forEach((element) {
+    lists.add(element.reference.parent.parent!.id);
+  });
+
+  return lists;
+}
+
 //내 글 리스트 불러오기
 Future<List> getDocumentList() async {
   List<String> lists = [];
@@ -29,15 +48,19 @@ Future<List> getDocumentList() async {
       .get();
   snapshot.docs.forEach((element) {
     lists.add(element.id);
-    print(element.data());
   });
 
   return lists;
 }
 
 // Map<글 코드, 글 데이터맵>
-Future<Map> getDocument() async {
-  List lists = await getDocumentList(); //
+Future<Map> getDocument(Map args) async {
+  List lists = [];
+  if (args["page"] == "questions") {
+    lists = await getDocumentList();
+  } else if (args["page"] == "ianswered") {
+    lists = await getAnsweredDocumentList();
+  }
   Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
 
   for (int i = 0; i < lists.length; i++) {
@@ -275,6 +298,7 @@ class _OthersPageSearchPageState extends State<OthersPageSearchPage> {
   //변수
   @override
   Widget build(BuildContext context) {
+    getAnsweredDocumentList();
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -303,7 +327,11 @@ class _OthersPageSearchPageState extends State<OthersPageSearchPage> {
                       ),
                       //Answer 텍스트
                       Text(
-                        args['page'] == 'questions' ? "Questions" : "f",
+                        args['page'] == 'questions'
+                            ? "Questions"
+                            : args['page'] == 'ianswered'
+                                ? "I Answered"
+                                : "Liked",
                         style: const TextStyle(
                           fontFamily: "Montserrat",
                           color: Colors.white,
@@ -316,7 +344,7 @@ class _OthersPageSearchPageState extends State<OthersPageSearchPage> {
                 ),
                 Expanded(
                   child: FutureBuilder(
-                    future: getDocument(),
+                    future: getDocument(args),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.hasData == false) {
                         return const Text("Loading...",
@@ -325,12 +353,11 @@ class _OthersPageSearchPageState extends State<OthersPageSearchPage> {
                               fontFamily: 'Montserrat',
                               fontSize: 20,
                             ));
-                        // ignore: dead_code
                       } else {
                         return RefreshIndicator(
                           onRefresh: () async {
                             setState(() {
-                              getDocument();
+                              getDocument(args);
                             });
                           },
                           child: SingleChildScrollView(
