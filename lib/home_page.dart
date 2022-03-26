@@ -8,7 +8,6 @@ import 'package:ask_it/main.dart';
 
 //안녕하세요
 //박무바보
-
 //전역변수
 //#region 변수
 int askPageSelected = 1;
@@ -23,42 +22,20 @@ class HomePage extends StatefulWidget {
 
 //#region 함수
 
-//내가 답변한 글 리스트 불러오기
-Future<List> getAnsweredDocumentList() async {
-  List<String> lists = [];
+// void readdata() async {
+//   List<String> lists = [];
+//   QuerySnapshot snapshot = await await FirebaseFirestore.instance
+//       .collection("AskPage_Questions")
+//       .get();
+//   List<dynamic> result = snapshot.docs.map((doc) => doc.data()).toList();
+//   print("aaaaa" + result.toString());
+//   print(result[0]["texts"]);
 
-  QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collectionGroup("ChatRoom")
-      .where(
-        'replier',
-        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
-      )
-      .get();
-
-  snapshot.docs.forEach((element) {
-    lists.add(element.reference.parent.parent!.id);
-  });
-
-  return lists;
-}
-
-//내 글 리스트 불러오기
-Future<List> getDocumentList() async {
-  List<String> lists = [];
-  QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection("AskPage_Questions")
-      .orderBy('date', descending: true)
-      .where(
-        'uid',
-        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
-      )
-      .get();
-  snapshot.docs.forEach((element) {
-    lists.add(element.id);
-  });
-
-  return lists;
-}
+//   // final usercol = await FirebaseFirestore.instance
+//   //     .collection("AskPage_Questions")
+//   //     .doc("9qK7py72Pd3CdfvrQBxe");
+//   // usercol.get().then((value) => {print(value.data())});
+// }
 
 Future<List> askGetDocumnetList() async {
   List<String> lists = [];
@@ -115,11 +92,19 @@ Future<List> discussGetDocumnetList() async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection("DiscussPage_Sessions")
         .orderBy('date', descending: true)
-        .where('ended', isEqualTo: false) //끝난 페이지는 제외
         .get();
     snapshot.docs.forEach((element) {
       lists.add(element.id);
     });
+
+    snapshot.docs.forEach((element) { //due_date를 지났으면 제외
+      DateTime due_date = element.get('due_date').toDate();
+      if(due_date.isBefore(DateTime.now())){
+        lists.remove(element.id);
+      }
+    });
+
+
   } else if (discussPageSelected == 2) {
     //Joined 페이지
     QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -135,11 +120,19 @@ Future<List> discussGetDocumnetList() async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection("DiscussPage_Sessions")
         .orderBy('date', descending: true)
-        .where('ended', isEqualTo: true)
         .get();
+
     snapshot.docs.forEach((element) {
       lists.add(element.id);
     });
+
+    snapshot.docs.forEach((element) { //due_date를 지나지 않았으면(세션 진행중이면) 제외
+      DateTime due_date = element.get('due_date').toDate();
+      if(due_date.isAfter(DateTime.now())){
+        lists.remove(element.id);
+      }
+    });
+
   }
 
   return lists;
@@ -1157,7 +1150,7 @@ class _OtherState extends State<Other> {
                             width: 100,
                             child: Column(
                               children: [
-                                const Text(
+                                Text(
                                   "Questions",
                                   style: TextStyle(
                                     color: Colors.white,
@@ -1167,31 +1160,15 @@ class _OtherState extends State<Other> {
                                   ),
                                 ),
                                 SizedBox(height: 6),
-                                FutureBuilder<Object>(
-                                    future: getDocumentList(),
-                                    builder: (context, AsyncSnapshot snapshot) {
-                                      if (snapshot.hasData == false) {
-                                        return const Text(
-                                          "-",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontFamily: "Montserrat",
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                          ),
-                                        );
-                                      } else {
-                                        return Text(
-                                          snapshot.data.length.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontFamily: "Montserrat",
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                          ),
-                                        );
-                                      }
-                                    }),
+                                Text(
+                                  "6",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -1206,7 +1183,7 @@ class _OtherState extends State<Other> {
                             width: 100,
                             child: Column(
                               children: [
-                                const Text(
+                                Text(
                                   "I Answered",
                                   style: TextStyle(
                                     color: Colors.white,
@@ -1216,31 +1193,15 @@ class _OtherState extends State<Other> {
                                   ),
                                 ),
                                 SizedBox(height: 6),
-                                FutureBuilder<Object>(
-                                    future: getAnsweredDocumentList(),
-                                    builder: (context, AsyncSnapshot snapshot) {
-                                      if (snapshot.hasData == false) {
-                                        return const Text(
-                                          "-",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontFamily: "Montserrat",
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                          ),
-                                        );
-                                      } else {
-                                        return Text(
-                                          snapshot.data.length.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontFamily: "Montserrat",
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                          ),
-                                        );
-                                      }
-                                    }),
+                                Text(
+                                  "12",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
