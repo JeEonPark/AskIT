@@ -16,10 +16,7 @@ class SessionViewPage extends StatefulWidget {
 Future<List> getDocumnetList(String docId) async {
   List<String> lists = [];
 
-  DocumentSnapshot snapshot = await FirebaseFirestore.instance
-      .collection("DiscussPage_Sessions")
-      .doc(docId)
-      .get();
+  DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(docId).get();
 
   lists.add(snapshot.id);
 
@@ -32,10 +29,7 @@ Future<Map> getDocument(String docId) async {
   Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
 
   for (int i = 0; i < lists.length; i++) {
-    final documentData = await FirebaseFirestore.instance
-        .collection("DiscussPage_Sessions")
-        .doc(lists[i])
-        .get();
+    final documentData = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(lists[i]).get();
     map[lists[i]] = documentData.data();
   }
 
@@ -55,10 +49,7 @@ Future editJoinedArray(String docId) async {
   String uid = snapshot.docs.first.get("uid");
 
   //이 세션의 joined 리스트 얻기
-  DocumentSnapshot snapshot2 = await FirebaseFirestore.instance
-      .collection("DiscussPage_Sessions")
-      .doc(docId)
-      .get();
+  DocumentSnapshot snapshot2 = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(docId).get();
 
   List joinedList = snapshot2.get('joined');
   bool joined = joinedList.contains(FirebaseAuth.instance.currentUser?.uid);
@@ -99,14 +90,10 @@ Future editLikedArray(String docId) async {
   String uid = snapshot.docs.first.get("uid");
 
   //이 세션의 liked 리스트 얻기
-  DocumentSnapshot snapshot2 = await FirebaseFirestore.instance
-      .collection("DiscussPage_Sessions")
-      .doc(docId)
-      .get();
+  DocumentSnapshot snapshot2 = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(docId).get();
 
   List likedList = snapshot2.get('liked');
   bool liked = likedList.contains(FirebaseAuth.instance.currentUser?.uid);
-  print(liked);
 
   if (liked) {
     //이미 좋아요 눌렀으면 리스트에서 빼기
@@ -157,7 +144,6 @@ class _SessionViewPageState extends State<SessionViewPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
-    print(args["title"]);
     final TextPainter textPainter = TextPainter(
       textDirection: TextDirection.ltr,
       text: TextSpan(
@@ -250,181 +236,113 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                       curve: Curves.easeInOut,
                                       child: pageSelected == 1
                                           ? SingleChildScrollView(
-                                              child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    //제목 박스
-                                                    Container(
-                                                      padding:
-                                                          EdgeInsets.fromLTRB(
-                                                              24, 0, 20, 0),
-                                                      child: Text(
-                                                        snapshot.data.values
-                                                            .elementAt(
-                                                                0)?['title'],
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 24,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                        ),
-                                                      ),
+                                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                                //제목 박스
+                                                Container(
+                                                  padding: EdgeInsets.fromLTRB(24, 0, 20, 0),
+                                                  child: Text(
+                                                    snapshot.data.values.elementAt(0)?['title'],
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 24,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontFamily: 'Montserrat',
                                                     ),
-                                                    //프로필 박스
-                                                    Container(
-                                                      height: 100,
-                                                      padding:
-                                                          EdgeInsets.all(25),
-                                                      child: Row(
+                                                  ),
+                                                ),
+                                                //프로필 박스
+                                                Container(
+                                                  height: 100,
+                                                  padding: EdgeInsets.all(25),
+                                                  child: Row(
+                                                    children: [
+                                                      //프로필 사진
+                                                      Container(
+                                                        decoration: BoxDecoration(
+                                                            border: Border.all(color: Colors.white, width: 1.5)),
+                                                        child:
+                                                            Icon(Icons.person_outline, color: Colors.white, size: 40),
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
-                                                          //프로필 사진
-                                                          Container(
-                                                            decoration: BoxDecoration(
-                                                                border: Border.all(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    width:
-                                                                        1.5)),
-                                                            child: Icon(
-                                                                Icons
-                                                                    .person_outline,
-                                                                color: Colors
-                                                                    .white,
-                                                                size: 40),
-                                                          ),
-                                                          Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                          //작성자 이름+버튼
+                                                          Row(
                                                             children: [
-                                                              //작성자 이름+버튼
-                                                              Row(
-                                                                children: [
-                                                                  Container(
-                                                                    padding: EdgeInsets
-                                                                        .fromLTRB(
-                                                                            20,
-                                                                            2,
-                                                                            0,
-                                                                            0),
-                                                                    child: Text(
-                                                                      snapshot
-                                                                          .data
-                                                                          .values
-                                                                          .elementAt(
-                                                                              0)?['author'],
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Colors
-                                                                            .white,
-                                                                        fontSize:
-                                                                            16,
-                                                                        fontFamily:
-                                                                            'Montserrat',
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    height:
-                                                                        16.0,
-                                                                    width: 16.0,
-                                                                    child: IconButton(
-                                                                        padding: EdgeInsets.fromLTRB(
-                                                                            15,
-                                                                            2,
-                                                                            0,
-                                                                            0),
-                                                                        iconSize:
-                                                                            16,
-                                                                        onPressed:
-                                                                            () {},
-                                                                        icon: Icon(
-                                                                            Icons
-                                                                                .arrow_forward_ios,
-                                                                            color:
-                                                                                Colors.white)),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              Spacer(),
-                                                              //level 등급. 임시로 egg level로 고정
                                                               Container(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .fromLTRB(
-                                                                            20,
-                                                                            0,
-                                                                            0,
-                                                                            4),
+                                                                padding: EdgeInsets.fromLTRB(20, 2, 0, 0),
                                                                 child: Text(
-                                                                  "Egg level",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontFamily:
-                                                                        'Montserrat',
+                                                                  snapshot.data.values.elementAt(0)?['author'],
+                                                                  style: TextStyle(
+                                                                    color: Colors.white,
+                                                                    fontSize: 16,
+                                                                    fontFamily: 'Montserrat',
                                                                   ),
                                                                 ),
                                                               ),
+                                                              SizedBox(width: 15),
+                                                              SizedBox(
+                                                                height: 16.0,
+                                                                width: 16.0,
+                                                                child: IconButton(
+                                                                    splashRadius: 20,
+                                                                    padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                                                    iconSize: 16,
+                                                                    onPressed: () {},
+                                                                    icon: Icon(Icons.arrow_forward_ios,
+                                                                        color: Colors.white)),
+                                                              ),
                                                             ],
+                                                          ),
+                                                          Spacer(),
+                                                          //level 등급. 임시로 egg level로 고정
+                                                          Container(
+                                                            padding: EdgeInsets.fromLTRB(20, 0, 0, 4),
+                                                            child: Text(
+                                                              "Egg level",
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: 14,
+                                                                fontFamily: 'Montserrat',
+                                                              ),
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
-                                                    ),
+                                                    ],
+                                                  ),
+                                                ),
 
-                                                    //기간 텍스트(임시로 고정)
-                                                    Container(
-                                                      padding:
-                                                          EdgeInsets.fromLTRB(
-                                                              24, 0, 0, 0),
-                                                      child: Text(
-                                                        "2022.03.06 ~ 2022.04.10",
-                                                        style: TextStyle(
-                                                          color: Color.fromARGB(
-                                                              153,
-                                                              255,
-                                                              255,
-                                                              255),
-                                                          fontSize: 15,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                        ),
-                                                      ),
+                                                //기간 텍스트(임시로 고정)
+                                                Container(
+                                                  padding: EdgeInsets.fromLTRB(24, 0, 0, 0),
+                                                  child: Text(
+                                                    "2022.03.06 ~ 2022.04.10",
+                                                    style: TextStyle(
+                                                      color: Color.fromARGB(153, 255, 255, 255),
+                                                      fontSize: 15,
+                                                      fontFamily: 'Montserrat',
                                                     ),
-                                                    //며칠 후 종료 텍스트(임시로 고정)
-                                                    Container(
-                                                      padding:
-                                                          EdgeInsets.fromLTRB(
-                                                              24, 5, 0, 0),
-                                                      child: Text(
-                                                        "ended after 3 days",
-                                                        style: TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              255,
-                                                              255,
-                                                              255),
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                        ),
-                                                      ),
+                                                  ),
+                                                ),
+                                                //며칠 후 종료 텍스트(임시로 고정)
+                                                Container(
+                                                  padding: EdgeInsets.fromLTRB(24, 5, 0, 0),
+                                                  child: Text(
+                                                    "ended after 3 days",
+                                                    style: TextStyle(
+                                                      color: Color.fromARGB(255, 255, 255, 255),
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontFamily: 'Montserrat',
                                                     ),
-                                                    SizedBox(height: 25),
-                                                  ]),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 25),
+                                              ]),
                                             )
                                           : null,
-                                      height: pageSelected == 1
-                                          ? 200 + textPainter.size.height - 29
-                                          : 0,
+                                      height: pageSelected == 1 ? 200 + textPainter.size.height - 29 : 0,
                                     ),
                                     Container(
                                       height: 1,
@@ -434,10 +352,8 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                     //Contents, community, live 선택바
                                     Container(
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           const Spacer(
                                             flex: 1,
@@ -447,17 +363,12 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             children: [
                                               TextButton(
                                                 style: TextButton.styleFrom(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      0, 15, 0, 0),
-                                                  tapTargetSize:
-                                                      MaterialTapTargetSize
-                                                          .shrinkWrap,
-                                                  splashFactory:
-                                                      NoSplash.splashFactory,
+                                                  padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                  splashFactory: NoSplash.splashFactory,
                                                   primary: pageSelected == 1
                                                       ? Colors.white
-                                                      : Color.fromARGB(
-                                                          100, 255, 255, 255),
+                                                      : Color.fromARGB(100, 255, 255, 255),
                                                   textStyle: const TextStyle(
                                                     fontSize: 15,
                                                     fontFamily: 'Montserrat',
@@ -474,17 +385,11 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                 decoration: BoxDecoration(
                                                   color: pageSelected == 1
                                                       ? Colors.white
-                                                      : const Color.fromARGB(
-                                                          0, 255, 255, 255),
-                                                  borderRadius:
-                                                      const BorderRadius.all(
-                                                          Radius.circular(100)),
+                                                      : const Color.fromARGB(0, 255, 255, 255),
+                                                  borderRadius: const BorderRadius.all(Radius.circular(100)),
                                                 ),
-                                                margin:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 2, 0, 0),
-                                                padding:
-                                                    const EdgeInsets.all(0),
+                                                margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                                padding: const EdgeInsets.all(0),
                                                 width: 40,
                                                 height: 1,
                                               ),
@@ -498,17 +403,12 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             children: [
                                               TextButton(
                                                 style: TextButton.styleFrom(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      0, 15, 0, 0),
-                                                  tapTargetSize:
-                                                      MaterialTapTargetSize
-                                                          .shrinkWrap, //???
-                                                  splashFactory:
-                                                      NoSplash.splashFactory,
+                                                  padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap, //???
+                                                  splashFactory: NoSplash.splashFactory,
                                                   primary: pageSelected == 2
                                                       ? Colors.white
-                                                      : Color.fromARGB(
-                                                          100, 255, 255, 255),
+                                                      : Color.fromARGB(100, 255, 255, 255),
                                                   textStyle: const TextStyle(
                                                     fontSize: 15,
                                                     fontFamily: 'Montserrat',
@@ -525,17 +425,11 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                 decoration: BoxDecoration(
                                                   color: pageSelected == 2
                                                       ? Colors.white
-                                                      : const Color.fromARGB(
-                                                          0, 255, 255, 255),
-                                                  borderRadius:
-                                                      const BorderRadius.all(
-                                                          Radius.circular(100)),
+                                                      : const Color.fromARGB(0, 255, 255, 255),
+                                                  borderRadius: const BorderRadius.all(Radius.circular(100)),
                                                 ),
-                                                margin:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 2, 0, 0),
-                                                padding:
-                                                    const EdgeInsets.all(0),
+                                                margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                                padding: const EdgeInsets.all(0),
                                                 width: 40,
                                                 height: 1,
                                               ),
@@ -549,17 +443,12 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             children: [
                                               TextButton(
                                                 style: TextButton.styleFrom(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      0, 15, 0, 0),
-                                                  tapTargetSize:
-                                                      MaterialTapTargetSize
-                                                          .shrinkWrap, //???
-                                                  splashFactory:
-                                                      NoSplash.splashFactory,
+                                                  padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap, //???
+                                                  splashFactory: NoSplash.splashFactory,
                                                   primary: pageSelected == 3
                                                       ? Colors.white
-                                                      : Color.fromARGB(
-                                                          100, 255, 255, 255),
+                                                      : Color.fromARGB(100, 255, 255, 255),
                                                   textStyle: const TextStyle(
                                                     fontSize: 15,
                                                     fontFamily: 'Montserrat',
@@ -576,17 +465,11 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                 decoration: BoxDecoration(
                                                   color: pageSelected == 3
                                                       ? Colors.white
-                                                      : const Color.fromARGB(
-                                                          0, 255, 255, 255),
-                                                  borderRadius:
-                                                      const BorderRadius.all(
-                                                          Radius.circular(100)),
+                                                      : const Color.fromARGB(0, 255, 255, 255),
+                                                  borderRadius: const BorderRadius.all(Radius.circular(100)),
                                                 ),
-                                                margin:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 2, 0, 0),
-                                                padding:
-                                                    const EdgeInsets.all(0),
+                                                margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                                padding: const EdgeInsets.all(0),
                                                 width: 20,
                                                 height: 1,
                                               ),
@@ -606,19 +489,13 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             child: Column(
                                               children: [
                                                 Container(
-                                                  margin: EdgeInsets.fromLTRB(
-                                                      24, 0, 20, 0),
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      0, 0, 0, 10),
+                                                  margin: EdgeInsets.fromLTRB(24, 0, 20, 0),
+                                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
                                                   child: Text(
-                                                    snapshot.data.values
-                                                        .elementAt(0)?['texts']
-                                                        .replaceAll(
-                                                            "\\n", "\n"),
+                                                    snapshot.data.values.elementAt(0)?['texts'].replaceAll("\\n", "\n"),
                                                     style: TextStyle(
                                                       height: 1.8,
-                                                      color: Color.fromARGB(
-                                                          255, 255, 255, 255),
+                                                      color: Color.fromARGB(255, 255, 255, 255),
                                                       fontSize: 15,
                                                       fontFamily: 'Montserrat',
                                                     ),
@@ -637,8 +514,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             "Community",
                                             style: TextStyle(
                                               height: 1.8,
-                                              color: Color.fromARGB(
-                                                  255, 255, 255, 255),
+                                              color: Color.fromARGB(255, 255, 255, 255),
                                               fontSize: 15,
                                               fontFamily: 'Montserrat',
                                             ),
@@ -653,8 +529,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             "Live",
                                             style: TextStyle(
                                               height: 1.8,
-                                              color: Color.fromARGB(
-                                                  255, 255, 255, 255),
+                                              color: Color.fromARGB(255, 255, 255, 255),
                                               fontSize: 15,
                                               fontFamily: 'Montserrat',
                                             ),
@@ -670,15 +545,10 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                 height: 60,
                                 child: Column(
                                   children: [
-                                    Container(
-                                        height: 1,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        color: Colors.white),
+                                    Container(height: 1, width: MediaQuery.of(context).size.width, color: Colors.white),
                                     Expanded(
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Spacer(),
                                           //하트
@@ -689,27 +559,19 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                               iconSize: 35,
                                               padding: EdgeInsets.all(0),
                                               onPressed: () async {
-                                                await editLikedArray(
-                                                    args['docId']);
+                                                await editLikedArray(args['docId']);
                                                 setState(() {});
                                               },
                                               icon: Icon(
                                                 (!snapshot.data.values
                                                         .elementAt(0)['liked']
-                                                        .contains(FirebaseAuth
-                                                            .instance
-                                                            .currentUser
-                                                            ?.uid))
+                                                        .contains(FirebaseAuth.instance.currentUser?.uid))
                                                     ? Icons.favorite_border
                                                     : Icons.favorite,
                                                 color: (snapshot.data.values
                                                         .elementAt(0)['liked']
-                                                        .contains(FirebaseAuth
-                                                            .instance
-                                                            .currentUser
-                                                            ?.uid))
-                                                    ? Color.fromARGB(
-                                                        255, 206, 55, 55)
+                                                        .contains(FirebaseAuth.instance.currentUser?.uid))
+                                                    ? Color.fromARGB(255, 206, 55, 55)
                                                     : Colors.white,
                                               ),
                                             ),
@@ -717,17 +579,12 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                           //좋아요 수
                                           Container(
                                             alignment: Alignment.center,
-                                            margin:
-                                                EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                                             width: 40,
                                             child: Text(
-                                              (snapshot.data.values
-                                                  .elementAt(0)['liked']
-                                                  .length
-                                                  .toString()),
+                                              (snapshot.data.values.elementAt(0)['liked'].length.toString()),
                                               style: TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 255, 255, 255),
+                                                color: Color.fromARGB(255, 255, 255, 255),
                                                 fontSize: 18,
                                                 fontFamily: 'Montserrat',
                                               ),
@@ -735,76 +592,50 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                           ),
                                           //Join this session 버튼(join 누르면 joined 리스트에 내가 추가됨. join 안했으면 반대)
                                           Container(
-                                            padding: EdgeInsets.fromLTRB(
-                                                10, 0, 0, 0),
+                                            padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                             height: 40,
                                             width: 280,
                                             child: ElevatedButton.icon(
                                               onPressed: () async {
-                                                await editJoinedArray(
-                                                    args['docId']);
+                                                await editJoinedArray(args['docId']);
                                                 setState(() {});
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
+                                                  borderRadius: BorderRadius.circular(20),
                                                 ),
-                                                primary: (snapshot.data.values
-                                                            .elementAt(
-                                                                0)['uid'] !=
-                                                        FirebaseAuth.instance
-                                                            .currentUser?.uid)
+                                                primary: (snapshot.data.values.elementAt(0)['uid'] !=
+                                                        FirebaseAuth.instance.currentUser?.uid)
                                                     ? Colors.white
-                                                    : Color.fromARGB(
-                                                        255, 108, 103, 103),
+                                                    : Color.fromARGB(255, 108, 103, 103),
                                               ),
                                               icon: Icon(
                                                 Icons.question_answer,
-                                                color: (snapshot.data.values
-                                                            .elementAt(
-                                                                0)['uid'] !=
-                                                        FirebaseAuth.instance
-                                                            .currentUser?.uid)
+                                                color: (snapshot.data.values.elementAt(0)['uid'] !=
+                                                        FirebaseAuth.instance.currentUser?.uid)
                                                     ? Colors.black
-                                                    : Color.fromARGB(
-                                                        127, 255, 255, 255),
+                                                    : Color.fromARGB(127, 255, 255, 255),
                                               ),
                                               label: (!snapshot.data.values
                                                       .elementAt(0)['joined']
-                                                      .contains(FirebaseAuth
-                                                          .instance
-                                                          .currentUser
-                                                          ?.uid))
+                                                      .contains(FirebaseAuth.instance.currentUser?.uid))
                                                   ? Text(
                                                       "Join this Session",
                                                       style: TextStyle(
                                                         color: Colors.black,
                                                         fontSize: 18,
-                                                        fontFamily:
-                                                            'Montserrat',
+                                                        fontFamily: 'Montserrat',
                                                       ),
                                                     )
                                                   : Text(
                                                       "Leave this Session",
                                                       style: TextStyle(
-                                                        color: (snapshot.data.values
-                                                                        .elementAt(
-                                                                            0)[
-                                                                    'uid'] !=
-                                                                FirebaseAuth
-                                                                    .instance
-                                                                    .currentUser
-                                                                    ?.uid)
+                                                        color: (snapshot.data.values.elementAt(0)['uid'] !=
+                                                                FirebaseAuth.instance.currentUser?.uid)
                                                             ? Colors.black
-                                                            : Color.fromARGB(
-                                                                127,
-                                                                255,
-                                                                255,
-                                                                255),
+                                                            : Color.fromARGB(127, 255, 255, 255),
                                                         fontSize: 18,
-                                                        fontFamily:
-                                                            'Montserrat',
+                                                        fontFamily: 'Montserrat',
                                                       ),
                                                     ),
                                             ),
