@@ -43,8 +43,7 @@ void main() async {
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Navigator',
-      initialRoute:
-          FirebaseAuth.instance.currentUser == null ? '/' : '/ask_page',
+      initialRoute: FirebaseAuth.instance.currentUser == null ? '/' : '/ask_page',
       routes: {
         '/': (context) => LoginPage(),
         '/sign_up_page': (context) => SignUpPage(),

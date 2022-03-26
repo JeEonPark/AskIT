@@ -53,10 +53,8 @@ Future<List> askGetDocumnetList() async {
       lists.add(element.id);
     });
   } else if (askPageSelected == 2) {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection("AskPage_Questions")
-        .orderBy('date', descending: true)
-        .get();
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection("AskPage_Questions").orderBy('date', descending: true).get();
     snapshot.docs.forEach((element) {
       lists.add(element.id);
     });
@@ -71,18 +69,14 @@ Future<Map> askGetDocument() async {
   Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
 
   for (int i = 0; i < lists.length; i++) {
-    final documentData = await FirebaseFirestore.instance
-        .collection("AskPage_Questions")
-        .doc(lists[i])
-        .get();
+    final documentData = await FirebaseFirestore.instance.collection("AskPage_Questions").doc(lists[i]).get();
     map[lists[i]] = documentData.data();
   }
   // print(DateFormat('yyyy.MM.dd')
   //     .format(map.values.elementAt(0)?['date'].toDate()));
   if (askPageSelected == 2) {
     for (int i = 0; i < map.length; i++) {
-      if (map.values.elementAt(i)?['uid'] ==
-          FirebaseAuth.instance.currentUser?.uid) {
+      if (map.values.elementAt(i)?['uid'] == FirebaseAuth.instance.currentUser?.uid) {
         map.remove(map.keys.elementAt(i));
         i--;
       }
@@ -135,10 +129,7 @@ Future<Map> discussGetDocument() async {
   Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
 
   for (int i = 0; i < lists.length; i++) {
-    final documentData = await FirebaseFirestore.instance
-        .collection("DiscussPage_Sessions")
-        .doc(lists[i])
-        .get();
+    final documentData = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(lists[i]).get();
     map[lists[i]] = documentData.data();
   }
   //if (askPageSelected == 2) {
@@ -233,8 +224,7 @@ class _HomePageState extends State<HomePage> {
 
 //#region first, second 함수
 
-Widget first(String docId, String title, String texts, String author,
-    DateTime date, String uid) {
+Widget first(String docId, String title, String texts, String author, DateTime date, String uid) {
   return GestureDetector(
     onTap: () async {
       await gotoQuestionViewPage(docId, title, texts, author, date, uid);
@@ -250,11 +240,7 @@ Widget first(String docId, String title, String texts, String author,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           stops: [0, 0.35, 1],
-          colors: [
-            Color.fromARGB(255, 91, 50, 180),
-            Color.fromARGB(255, 88, 55, 165),
-            Color.fromARGB(255, 49, 27, 96)
-          ],
+          colors: [Color.fromARGB(255, 91, 50, 180), Color.fromARGB(255, 88, 55, 165), Color.fromARGB(255, 49, 27, 96)],
         ),
       ),
       child: Column(
@@ -345,8 +331,7 @@ Widget first(String docId, String title, String texts, String author,
   );
 }
 
-Widget second(String docId, String title, String texts, String author,
-    DateTime date, String uid) {
+Widget second(String docId, String title, String texts, String author, DateTime date, String uid) {
   return GestureDetector(
     onTap: () {
       gotoQuestionViewPage(docId, title, texts, author, date, uid);
@@ -462,8 +447,7 @@ Widget second(String docId, String title, String texts, String author,
 //#endregion
 
 //#region gotoQuestionViewPage 함수
-Future gotoQuestionViewPage(String docId, String title, String texts,
-    String author, DateTime date, String uid) async {
+Future gotoQuestionViewPage(String docId, String title, String texts, String author, DateTime date, String uid) async {
   if (_currentIndex == 0) {
     await navigatorKey.currentState?.pushNamed(
       '/question_view_page',
@@ -477,8 +461,7 @@ Future gotoQuestionViewPage(String docId, String title, String texts,
       },
     );
   } else if (_currentIndex == 1) {
-    await navigatorKey.currentState
-        ?.pushNamed('/session_view_page', arguments: {
+    await navigatorKey.currentState?.pushNamed('/session_view_page', arguments: {
       "docId": docId,
       "title": title,
       "texts": texts,
@@ -548,8 +531,7 @@ class _AskState extends State<Ask> {
                             //검색버튼
                             IconButton(
                               onPressed: () {
-                                navigatorKey.currentState
-                                    ?.pushNamed('/search_page');
+                                navigatorKey.currentState?.pushNamed('/search_page');
                               },
                               iconSize: 35,
                               icon: const Icon(
@@ -591,9 +573,7 @@ class _AskState extends State<Ask> {
                             padding: EdgeInsets.all(0),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             splashFactory: NoSplash.splashFactory,
-                            primary: askPageSelected == 1
-                                ? Colors.white
-                                : Color.fromARGB(100, 255, 255, 255),
+                            primary: askPageSelected == 1 ? Colors.white : Color.fromARGB(100, 255, 255, 255),
                             textStyle: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -610,11 +590,8 @@ class _AskState extends State<Ask> {
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: askPageSelected == 1
-                                ? Colors.white
-                                : const Color.fromARGB(0, 255, 255, 255),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
+                            color: askPageSelected == 1 ? Colors.white : const Color.fromARGB(0, 255, 255, 255),
+                            borderRadius: const BorderRadius.all(Radius.circular(100)),
                           ),
                           margin: const EdgeInsets.all(0),
                           padding: const EdgeInsets.all(0),
@@ -632,12 +609,9 @@ class _AskState extends State<Ask> {
                         TextButton(
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.all(0),
-                            tapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap, //???
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap, //???
                             splashFactory: NoSplash.splashFactory,
-                            primary: askPageSelected == 2
-                                ? Colors.white
-                                : Color.fromARGB(100, 255, 255, 255),
+                            primary: askPageSelected == 2 ? Colors.white : Color.fromARGB(100, 255, 255, 255),
                             textStyle: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -654,11 +628,8 @@ class _AskState extends State<Ask> {
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: askPageSelected == 2
-                                ? Colors.white
-                                : const Color.fromARGB(0, 255, 255, 255),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
+                            color: askPageSelected == 2 ? Colors.white : const Color.fromARGB(0, 255, 255, 255),
+                            borderRadius: const BorderRadius.all(Radius.circular(100)),
                           ),
                           margin: const EdgeInsets.all(0),
                           padding: const EdgeInsets.all(0),
@@ -688,8 +659,7 @@ class _AskState extends State<Ask> {
                       ),
                       child: FutureBuilder(
                         future: askGetDocument(),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.hasData == false || loading == true) {
                             //데이터 받아오는중
                             loading = false;
@@ -717,55 +687,33 @@ class _AskState extends State<Ask> {
                                 physics: AlwaysScrollableScrollPhysics(),
                                 child: Column(
                                   children: [
-                                    for (int i = 0;
-                                        i < snapshot.data.length;
-                                        i++)
+                                    for (int i = 0; i < snapshot.data.length; i++)
                                       i % 2 == 0
                                           ? Column(
                                               children: [
                                                 if (i == 0) SizedBox(height: 5),
                                                 first(
-                                                  snapshot.data.keys
-                                                      .elementAt(i),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['title'],
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['texts']
-                                                      .replaceAll("\\n", " "),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['author'],
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['date']
-                                                      .toDate(),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['uid'],
+                                                  snapshot.data.keys.elementAt(i),
+                                                  snapshot.data.values.elementAt(i)?['title'],
+                                                  snapshot.data.values.elementAt(i)?['texts'].replaceAll("\\n", " "),
+                                                  snapshot.data.values.elementAt(i)?['author'],
+                                                  snapshot.data.values.elementAt(i)?['date'].toDate(),
+                                                  snapshot.data.values.elementAt(i)?['uid'],
                                                 ),
-                                                if (i ==
-                                                    snapshot.data.length - 1)
-                                                  SizedBox(height: 5),
+                                                if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                               ],
                                             )
                                           : Column(
                                               children: [
                                                 second(
-                                                  snapshot.data.keys
-                                                      .elementAt(i),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['title'],
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['texts']
-                                                      .replaceAll("\\n", " "),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['author'],
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['date']
-                                                      .toDate(),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['uid'],
+                                                  snapshot.data.keys.elementAt(i),
+                                                  snapshot.data.values.elementAt(i)?['title'],
+                                                  snapshot.data.values.elementAt(i)?['texts'].replaceAll("\\n", " "),
+                                                  snapshot.data.values.elementAt(i)?['author'],
+                                                  snapshot.data.values.elementAt(i)?['date'].toDate(),
+                                                  snapshot.data.values.elementAt(i)?['uid'],
                                                 ),
-                                                if (i ==
-                                                    snapshot.data.length - 1)
-                                                  SizedBox(height: 5),
+                                                if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                               ],
                                             ),
                                   ],
@@ -847,8 +795,7 @@ class _DiscussState extends State<Discuss> {
                             //검색버튼
                             IconButton(
                               onPressed: () async {
-                                await navigatorKey.currentState
-                                    ?.pushNamed('/search_page');
+                                await navigatorKey.currentState?.pushNamed('/search_page');
                                 setState(() {});
                               },
                               iconSize: 35,
@@ -894,9 +841,7 @@ class _DiscussState extends State<Discuss> {
                               padding: EdgeInsets.all(0),
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               splashFactory: NoSplash.splashFactory,
-                              primary: discussPageSelected == 1
-                                  ? Colors.white
-                                  : Color.fromARGB(100, 255, 255, 255),
+                              primary: discussPageSelected == 1 ? Colors.white : Color.fromARGB(100, 255, 255, 255),
                               textStyle: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
@@ -913,11 +858,8 @@ class _DiscussState extends State<Discuss> {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: discussPageSelected == 1
-                                  ? Colors.white
-                                  : const Color.fromARGB(0, 255, 255, 255),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(100)),
+                              color: discussPageSelected == 1 ? Colors.white : const Color.fromARGB(0, 255, 255, 255),
+                              borderRadius: const BorderRadius.all(Radius.circular(100)),
                             ),
                             margin: const EdgeInsets.all(0),
                             padding: const EdgeInsets.all(0),
@@ -933,12 +875,9 @@ class _DiscussState extends State<Discuss> {
                           TextButton(
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.all(0),
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap, //???
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap, //???
                               splashFactory: NoSplash.splashFactory,
-                              primary: discussPageSelected == 2
-                                  ? Colors.white
-                                  : Color.fromARGB(100, 255, 255, 255),
+                              primary: discussPageSelected == 2 ? Colors.white : Color.fromARGB(100, 255, 255, 255),
                               textStyle: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
@@ -955,11 +894,8 @@ class _DiscussState extends State<Discuss> {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: discussPageSelected == 2
-                                  ? Colors.white
-                                  : const Color.fromARGB(0, 255, 255, 255),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(100)),
+                              color: discussPageSelected == 2 ? Colors.white : const Color.fromARGB(0, 255, 255, 255),
+                              borderRadius: const BorderRadius.all(Radius.circular(100)),
                             ),
                             margin: const EdgeInsets.all(0),
                             padding: const EdgeInsets.all(0),
@@ -975,12 +911,9 @@ class _DiscussState extends State<Discuss> {
                           TextButton(
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.all(0),
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap, //???
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap, //???
                               splashFactory: NoSplash.splashFactory,
-                              primary: discussPageSelected == 3
-                                  ? Colors.white
-                                  : Color.fromARGB(100, 255, 255, 255),
+                              primary: discussPageSelected == 3 ? Colors.white : Color.fromARGB(100, 255, 255, 255),
                               textStyle: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
@@ -997,11 +930,8 @@ class _DiscussState extends State<Discuss> {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: discussPageSelected == 3
-                                  ? Colors.white
-                                  : const Color.fromARGB(0, 255, 255, 255),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(100)),
+                              color: discussPageSelected == 3 ? Colors.white : const Color.fromARGB(0, 255, 255, 255),
+                              borderRadius: const BorderRadius.all(Radius.circular(100)),
                             ),
                             margin: const EdgeInsets.all(0),
                             padding: const EdgeInsets.all(0),
@@ -1029,8 +959,7 @@ class _DiscussState extends State<Discuss> {
                       ),
                       child: FutureBuilder(
                         future: discussGetDocument(),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.hasData == false || loading == true) {
                             //데이터 받아오는중
                             loading = false;
@@ -1057,55 +986,32 @@ class _DiscussState extends State<Discuss> {
                                 physics: AlwaysScrollableScrollPhysics(),
                                 child: Column(
                                   children: [
-                                    for (int i = 0;
-                                        i < snapshot.data.length;
-                                        i++)
+                                    for (int i = 0; i < snapshot.data.length; i++)
                                       i % 2 == 0
                                           ? Column(
                                               children: [
                                                 if (i == 0) SizedBox(height: 5),
                                                 first(
-                                                  snapshot.data.keys
-                                                      .elementAt(i),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['title'],
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['texts']
-                                                      .replaceAll("\\n", " "),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['author'],
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['date']
-                                                      .toDate(),
-                                                  snapshot.data.values
-                                                      .elementAt(i)?['uid'],
+                                                  snapshot.data.keys.elementAt(i),
+                                                  snapshot.data.values.elementAt(i)?['title'],
+                                                  snapshot.data.values.elementAt(i)?['texts'].replaceAll("\\n", " "),
+                                                  snapshot.data.values.elementAt(i)?['author'],
+                                                  snapshot.data.values.elementAt(i)?['date'].toDate(),
+                                                  snapshot.data.values.elementAt(i)?['uid'],
                                                 ),
-                                                if (i ==
-                                                    snapshot.data.length - 1)
-                                                  SizedBox(height: 5),
+                                                if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                               ],
                                             )
                                           : Column(
                                               children: [
                                                 second(
-                                                    snapshot.data.keys
-                                                        .elementAt(i),
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['title'],
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['texts']
-                                                        .replaceAll("\\n", " "),
-                                                    snapshot.data.values
-                                                        .elementAt(
-                                                            i)?['author'],
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['date']
-                                                        .toDate(),
-                                                    snapshot.data.values
-                                                        .elementAt(i)?['uid']),
-                                                if (i ==
-                                                    snapshot.data.length - 1)
-                                                  SizedBox(height: 5),
+                                                    snapshot.data.keys.elementAt(i),
+                                                    snapshot.data.values.elementAt(i)?['title'],
+                                                    snapshot.data.values.elementAt(i)?['texts'].replaceAll("\\n", " "),
+                                                    snapshot.data.values.elementAt(i)?['author'],
+                                                    snapshot.data.values.elementAt(i)?['date'].toDate(),
+                                                    snapshot.data.values.elementAt(i)?['uid']),
+                                                if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                               ],
                                             ),
                                   ],
@@ -1190,10 +1096,8 @@ class _OtherState extends State<Other> {
                   children: [
                     //프로필 사진
                     Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 1.5)),
-                      child: Icon(Icons.person_outline,
-                          color: Colors.white, size: 60),
+                      decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 1.5)),
+                      child: Icon(Icons.person_outline, color: Colors.white, size: 60),
                     ),
                     SizedBox(height: 10),
                     //이름 레벨
@@ -1223,9 +1127,8 @@ class _OtherState extends State<Other> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            navigatorKey.currentState?.pushNamed(
-                                '/others_page_search_page',
-                                arguments: {"page": "questions"});
+                            navigatorKey.currentState
+                                ?.pushNamed('/others_page_search_page', arguments: {"page": "questions"});
                           },
                           child: Container(
                             color: const Color.fromARGB(255, 29, 30, 37),
@@ -1257,9 +1160,8 @@ class _OtherState extends State<Other> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            navigatorKey.currentState?.pushNamed(
-                                '/others_page_search_page',
-                                arguments: {"page": "ianswered"});
+                            navigatorKey.currentState
+                                ?.pushNamed('/others_page_search_page', arguments: {"page": "ianswered"});
                           },
                           child: Container(
                             color: const Color.fromARGB(255, 29, 30, 37),
@@ -1291,9 +1193,8 @@ class _OtherState extends State<Other> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            navigatorKey.currentState?.pushNamed(
-                                '/others_page_search_page',
-                                arguments: {"page": "liked"});
+                            navigatorKey.currentState
+                                ?.pushNamed('/others_page_search_page', arguments: {"page": "liked"});
                           },
                           child: Container(
                             color: const Color.fromARGB(255, 29, 30, 37),

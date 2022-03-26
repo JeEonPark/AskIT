@@ -6,7 +6,6 @@ import 'package:flutter/scheduler.dart';
 
 import 'main.dart';
 
-
 class AddSessionPage extends StatefulWidget {
   AddSessionPage({Key? key}) : super(key: key);
 

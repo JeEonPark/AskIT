@@ -10,8 +10,7 @@ final textsInputController = TextEditingController();
 
 int currentIndex = 0;
 
-final PageController controller =
-    PageController(initialPage: 0, viewportFraction: 1);
+final PageController controller = PageController(initialPage: 0, viewportFraction: 1);
 
 class AddQuestionPage extends StatefulWidget {
   @override
@@ -177,9 +176,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                               iconSize: 30,
                               onPressed: () {
                                 if (currentIndex == 2) {
-                                  writeQuestionDocument(
-                                      titleInputController.text,
-                                      textsInputController.text);
+                                  writeQuestionDocument(titleInputController.text, textsInputController.text);
                                   Navigator.pop(context);
                                   currentIndex = 0;
                                   titleInputController.clear();
@@ -194,9 +191,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                                 }
                               },
                               icon: Icon(
-                                currentIndex == 2
-                                    ? Icons.check_outlined
-                                    : Icons.arrow_forward_ios_rounded,
+                                currentIndex == 2 ? Icons.check_outlined : Icons.arrow_forward_ios_rounded,
                                 color: Colors.white,
                               ),
                             ),
@@ -236,12 +231,10 @@ Widget addQuestionFirstPage() {
             ),
             decoration: const InputDecoration(
               enabledBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
               ),
               prefixIcon: SizedBox(
                 child: Center(

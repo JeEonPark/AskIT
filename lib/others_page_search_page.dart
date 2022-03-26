@@ -41,10 +41,7 @@ Future<Map> getDocument() async {
   Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
 
   for (int i = 0; i < lists.length; i++) {
-    final documentData = await FirebaseFirestore.instance
-        .collection("AskPage_Questions")
-        .doc(lists[i])
-        .get();
+    final documentData = await FirebaseFirestore.instance.collection("AskPage_Questions").doc(lists[i]).get();
     map[lists[i]] = documentData.data();
   }
 
@@ -54,8 +51,7 @@ Future<Map> getDocument() async {
 //#endregion Firebase 함수
 
 //#region First, Second 위젯
-Widget first(String docId, String title, String texts, String author,
-    DateTime date, String uid) {
+Widget first(String docId, String title, String texts, String author, DateTime date, String uid) {
   return GestureDetector(
     onTap: () {
       gotoQuestionViewPage(docId, title, texts, author, date, uid);
@@ -70,11 +66,7 @@ Widget first(String docId, String title, String texts, String author,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           stops: [0, 0.35, 1],
-          colors: [
-            Color.fromARGB(255, 91, 50, 180),
-            Color.fromARGB(255, 88, 55, 165),
-            Color.fromARGB(255, 49, 27, 96)
-          ],
+          colors: [Color.fromARGB(255, 91, 50, 180), Color.fromARGB(255, 88, 55, 165), Color.fromARGB(255, 49, 27, 96)],
         ),
       ),
       child: Column(
@@ -165,8 +157,7 @@ Widget first(String docId, String title, String texts, String author,
   );
 }
 
-Widget second(String docId, String title, String texts, String author,
-    DateTime date, String uid) {
+Widget second(String docId, String title, String texts, String author, DateTime date, String uid) {
   return GestureDetector(
     onTap: () {
       gotoQuestionViewPage(docId, title, texts, author, date, uid);
@@ -353,40 +344,26 @@ class _OthersPageSearchPageState extends State<OthersPageSearchPage> {
                                             if (i == 0) SizedBox(height: 5),
                                             first(
                                               snapshot.data.keys.elementAt(i),
-                                              snapshot.data.values
-                                                  .elementAt(i)?['title'],
-                                              snapshot.data.values
-                                                  .elementAt(i)?['texts'],
-                                              snapshot.data.values
-                                                  .elementAt(i)?['author'],
-                                              snapshot.data.values
-                                                  .elementAt(i)?['date']
-                                                  .toDate(),
-                                              snapshot.data.values
-                                                  .elementAt(i)?['uid'],
+                                              snapshot.data.values.elementAt(i)?['title'],
+                                              snapshot.data.values.elementAt(i)?['texts'],
+                                              snapshot.data.values.elementAt(i)?['author'],
+                                              snapshot.data.values.elementAt(i)?['date'].toDate(),
+                                              snapshot.data.values.elementAt(i)?['uid'],
                                             ),
-                                            if (i == snapshot.data.length - 1)
-                                              SizedBox(height: 5),
+                                            if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                           ],
                                         )
                                       : Column(
                                           children: [
                                             second(
                                               snapshot.data.keys.elementAt(i),
-                                              snapshot.data.values
-                                                  .elementAt(i)?['title'],
-                                              snapshot.data.values
-                                                  .elementAt(i)?['texts'],
-                                              snapshot.data.values
-                                                  .elementAt(i)?['author'],
-                                              snapshot.data.values
-                                                  .elementAt(i)?['date']
-                                                  .toDate(),
-                                              snapshot.data.values
-                                                  .elementAt(i)?['uid'],
+                                              snapshot.data.values.elementAt(i)?['title'],
+                                              snapshot.data.values.elementAt(i)?['texts'],
+                                              snapshot.data.values.elementAt(i)?['author'],
+                                              snapshot.data.values.elementAt(i)?['date'].toDate(),
+                                              snapshot.data.values.elementAt(i)?['uid'],
                                             ),
-                                            if (i == snapshot.data.length - 1)
-                                              SizedBox(height: 5),
+                                            if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                           ],
                                         ),
                               ],

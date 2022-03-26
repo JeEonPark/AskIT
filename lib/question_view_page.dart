@@ -14,10 +14,7 @@ class QuestionViewPage extends StatefulWidget {
 
 //글 지우기
 void deleteQuestion(String docId) async {
-  FirebaseFirestore.instance
-      .collection("AskPage_Questions")
-      .doc(docId)
-      .delete();
+  FirebaseFirestore.instance.collection("AskPage_Questions").doc(docId).delete();
 }
 
 //uid로 닉네임 불러오기
@@ -49,11 +46,8 @@ Future<List> chatRoomList(String questionDocId) async {
   }
 
   //나머지 답변
-  snapshot = await FirebaseFirestore.instance
-      .collection('AskPage_Questions')
-      .doc(questionDocId)
-      .collection("ChatRoom")
-      .get();
+  snapshot =
+      await FirebaseFirestore.instance.collection('AskPage_Questions').doc(questionDocId).collection("ChatRoom").get();
   snapshot.docs.forEach((element) {
     if (element.get("replier") != FirebaseAuth.instance.currentUser?.uid) {
       result.add(element.id);
@@ -69,8 +63,7 @@ Future<Map<String, Map>> mapChatroomUidChat(String questionDocId) async {
   Map<String, Map> map = {};
   for (var element in list) {
     //답변자 닉네임
-    DocumentSnapshot<Map<String, dynamic>> docSnapshot = await FirebaseFirestore
-        .instance
+    DocumentSnapshot<Map<String, dynamic>> docSnapshot = await FirebaseFirestore.instance
         .collection('AskPage_Questions')
         .doc(questionDocId)
         .collection("ChatRoom")
@@ -144,8 +137,7 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                             iconSize: 35,
                           ),
                           Spacer(),
-                          if (args['uid'] ==
-                              FirebaseAuth.instance.currentUser?.uid)
+                          if (args['uid'] == FirebaseAuth.instance.currentUser?.uid)
                             IconButton(
                               padding: EdgeInsets.all(20),
                               onPressed: () {
@@ -153,8 +145,7 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      content: Text(
-                                          "Do you want to delete Question?"),
+                                      content: Text("Do you want to delete Question?"),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
@@ -245,16 +236,13 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                               children: [
                                 FutureBuilder(
                                     future: mapChatroomUidChat(args['docId']),
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot snapshot) {
+                                    builder: (BuildContext context, AsyncSnapshot snapshot) {
                                       if (snapshot.hasData == false) {
                                         return Container(
                                           alignment: Alignment.center,
                                           child: Text(
                                             "Loading...",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontFamily: "Montserrat"),
+                                            style: TextStyle(color: Colors.white, fontFamily: "Montserrat"),
                                           ),
                                         );
                                       } else {
@@ -263,25 +251,16 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                         ;
                                         return Column(
                                           children: [
-                                            for (int i = 0;
-                                                i < snapshotMap.length;
-                                                i++)
+                                            for (int i = 0; i < snapshotMap.length; i++)
                                               if (i == 0 &&
-                                                  snapshotMap.values
-                                                          .first["userUid"] ==
-                                                      FirebaseAuth.instance
-                                                          .currentUser?.uid)
+                                                  snapshotMap.values.first["userUid"] ==
+                                                      FirebaseAuth.instance.currentUser?.uid)
                                                 Column(
                                                   children: [
-                                                    myAnswer(
-                                                        snapshotMap.values
-                                                            .first["texts"],
-                                                        args,
+                                                    myAnswer(snapshotMap.values.first["texts"], args,
                                                         snapshotMap.keys.first),
                                                     SizedBox(height: 12),
-                                                    Container(
-                                                        height: 1,
-                                                        color: Colors.white),
+                                                    Container(height: 1, color: Colors.white),
                                                     SizedBox(height: 12),
                                                   ],
                                                 )
@@ -289,15 +268,10 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
                                                 Column(
                                                   children: [
                                                     othersAnswer(
-                                                      snapshotMap.values
-                                                          .elementAt(
-                                                              i)["username"],
-                                                      snapshotMap.values
-                                                          .elementAt(
-                                                              i)["texts"],
+                                                      snapshotMap.values.elementAt(i)["username"],
+                                                      snapshotMap.values.elementAt(i)["texts"],
                                                       args,
-                                                      snapshotMap.keys
-                                                          .elementAt(i),
+                                                      snapshotMap.keys.elementAt(i),
                                                     ),
                                                     SizedBox(height: 12)
                                                   ],
@@ -322,8 +296,7 @@ class _QuestionViewPageState extends State<QuestionViewPage> {
             future: ifIAnswered(args["docId"]),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               print(snapshot.data);
-              if (snapshot.data == false &&
-                  args["uid"] != FirebaseAuth.instance.currentUser?.uid) {
+              if (snapshot.data == false && args["uid"] != FirebaseAuth.instance.currentUser?.uid) {
                 return FloatingActionButton.extended(
                   onPressed: () async {
                     await navigatorKey.currentState?.pushNamed(
@@ -381,10 +354,7 @@ Widget myAnswer(String texts, Map args, String chatRoomUid) {
     },
     child: Container(
       height: 70,
-      width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext)
-              .size
-              .width *
-          0.86,
+      width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width * 0.86,
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 127, 116, 255),
         borderRadius: BorderRadius.circular(10),
@@ -423,8 +393,7 @@ Widget myAnswer(String texts, Map args, String chatRoomUid) {
   );
 }
 
-Widget othersAnswer(
-    String username, String texts, Map args, String chatRoomUid) {
+Widget othersAnswer(String username, String texts, Map args, String chatRoomUid) {
   return GestureDetector(
     onTap: () async {
       await navigatorKey.currentState?.pushNamed(
@@ -442,10 +411,7 @@ Widget othersAnswer(
     },
     child: Container(
       height: 70,
-      width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext)
-              .size
-              .width *
-          0.86,
+      width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width * 0.86,
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 80, 87, 152),
         borderRadius: BorderRadius.circular(10),

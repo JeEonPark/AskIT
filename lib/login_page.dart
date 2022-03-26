@@ -72,8 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                           //이메일 텍스트박스------------------------------
                           controller: emailInputController,
                           focusNode: widget.textEmailFocus,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                           decoration: const InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
@@ -97,8 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                           focusNode: widget.textPasswordFocus,
                           keyboardType: TextInputType.visiblePassword,
                           obscureText: true,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                           decoration: const InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
@@ -133,9 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         onPressed: () async {
                           try {
-                            UserCredential userCredential = await FirebaseAuth
-                                .instance
-                                .signInWithEmailAndPassword(
+                            UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
                               email: emailInputController.text,
                               password: passwordInputController.text,
                             );

@@ -12,8 +12,7 @@ class OthersMessagePage extends StatefulWidget {
 }
 
 //내 채팅 입력
-void writeChatting(
-    String questionDocId, String texts, String chatRoomId) async {
+void writeChatting(String questionDocId, String texts, String chatRoomId) async {
   await FirebaseFirestore.instance
       .collection('AskPage_Questions')
       .doc(questionDocId)
@@ -92,14 +91,10 @@ Future<Map> getDocument(String questionDocId, String chatRoomId) async {
 }
 
 //채팅방 uid 닉네임 맵 매치
-Future<Map> getChatroomUidUsername(
-    String questionDocId, String chatRoomId) async {
+Future<Map> getChatroomUidUsername(String questionDocId, String chatRoomId) async {
   Map lists = {};
   //질문 올린 사람 uid 닉네임 매치
-  DocumentSnapshot snapshot = await FirebaseFirestore.instance
-      .collection("AskPage_Questions")
-      .doc(questionDocId)
-      .get();
+  DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("AskPage_Questions").doc(questionDocId).get();
 
   String uid1 = snapshot.get("uid");
   String username1 = await getUsernamebyUid(uid1);
@@ -179,12 +174,9 @@ class _OthersMessagePageState extends State<OthersMessagePage> {
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   child: StreamBuilder(
-                      stream:
-                          chattingStream(args["docId"], args["chatRoomUid"]),
-                      builder:
-                          (BuildContext context, AsyncSnapshot streamsnapshot) {
-                        if (streamsnapshot.connectionState ==
-                            ConnectionState.waiting) {
+                      stream: chattingStream(args["docId"], args["chatRoomUid"]),
+                      builder: (BuildContext context, AsyncSnapshot streamsnapshot) {
+                        if (streamsnapshot.connectionState == ConnectionState.waiting) {
                           //데이터 받아오는중
                           return Container(
                             alignment: Alignment.center,
@@ -199,10 +191,8 @@ class _OthersMessagePageState extends State<OthersMessagePage> {
                         } else {
                           // Map snapshotMap = snapshot.data as Map;
                           return FutureBuilder(
-                              future: getDocument(
-                                  args['docId'], args['chatRoomUid']),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot snapshot) {
+                              future: getDocument(args['docId'], args['chatRoomUid']),
+                              builder: (BuildContext context, AsyncSnapshot snapshot) {
                                 if (snapshot.hasData == false) {
                                   return Container(
                                     alignment: Alignment.center,
@@ -220,32 +210,20 @@ class _OthersMessagePageState extends State<OthersMessagePage> {
                                     reverse: true,
                                     child: Column(
                                       children: [
-                                        for (int i = 0;
-                                            i < snapshotMap.length;
-                                            i++)
+                                        for (int i = 0; i < snapshotMap.length; i++)
                                           // 내가 보낸 채팅일 경우
-                                          if (snapshotMap.values
-                                                  .elementAt(i)["sender_uid"] ==
-                                              FirebaseAuth
-                                                  .instance.currentUser?.uid)
+                                          if (snapshotMap.values.elementAt(i)["sender_uid"] ==
+                                              FirebaseAuth.instance.currentUser?.uid)
                                             MessageFromRight(
-                                                snapshotMap.values
-                                                    .elementAt(i)["texts"],
-                                                snapshotMap.values
-                                                    .elementAt(i)["date"]
-                                                    .toDate(),
-                                                snapshotMap.values
-                                                    .elementAt(i)["username"])
+                                                snapshotMap.values.elementAt(i)["texts"],
+                                                snapshotMap.values.elementAt(i)["date"].toDate(),
+                                                snapshotMap.values.elementAt(i)["username"])
                                           // 상대가 보낸 채팅일 경우
                                           else
                                             MessageFromLeft(
-                                                snapshotMap.values
-                                                    .elementAt(i)["texts"],
-                                                snapshotMap.values
-                                                    .elementAt(i)["date"]
-                                                    .toDate(),
-                                                snapshotMap.values
-                                                    .elementAt(i)["username"])
+                                                snapshotMap.values.elementAt(i)["texts"],
+                                                snapshotMap.values.elementAt(i)["date"].toDate(),
+                                                snapshotMap.values.elementAt(i)["username"])
                                       ],
                                     ),
                                   );
@@ -269,8 +247,7 @@ class _OthersMessagePageState extends State<OthersMessagePage> {
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (args["uid"] ==
-                              FirebaseAuth.instance.currentUser?.uid)
+                          if (args["uid"] == FirebaseAuth.instance.currentUser?.uid)
                             SizedBox(
                               width: 10,
                             ),
@@ -291,12 +268,10 @@ class _OthersMessagePageState extends State<OthersMessagePage> {
                             child: TextFormField(
                               controller: textController,
                               focusNode: widget.textFocus,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.black),
+                              style: const TextStyle(fontSize: 14, color: Colors.black),
                               decoration: InputDecoration(
                                 isDense: true,
-                                contentPadding:
-                                    const EdgeInsets.fromLTRB(14, 8, 14, 8),
+                                contentPadding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide.none,
                                   borderRadius: BorderRadius.circular(20),
@@ -320,8 +295,7 @@ class _OthersMessagePageState extends State<OthersMessagePage> {
                                 splashRadius: 25,
                                 iconSize: 30,
                                 onPressed: () {
-                                  writeChatting(args['docId'],
-                                      textController.text, args['chatRoomUid']);
+                                  writeChatting(args['docId'], textController.text, args['chatRoomUid']);
                                   textController.clear();
                                 },
                                 icon: Icon(
@@ -386,11 +360,7 @@ Widget MessageFromRight(String texts, DateTime date, String sender) {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             LimitedBox(
-              maxWidth: MediaQuery.of(
-                          navigatorKey.currentState?.context as BuildContext)
-                      .size
-                      .width *
-                  0.8,
+              maxWidth: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width * 0.8,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: Color.fromARGB(255, 72, 63, 178),
@@ -447,11 +417,7 @@ Widget MessageFromLeft(String texts, DateTime date, String sender) {
           children: [
             SizedBox(width: 20),
             LimitedBox(
-              maxWidth: MediaQuery.of(
-                          navigatorKey.currentState?.context as BuildContext)
-                      .size
-                      .width *
-                  0.8,
+              maxWidth: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width * 0.8,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: Colors.black,

@@ -79,8 +79,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           //이메일 텍스트박스----------------------------
                           controller: emailInputController,
                           focusNode: widget.textEmailFocus,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                           decoration: const InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
@@ -104,8 +103,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           focusNode: widget.textPasswordFocus,
                           keyboardType: TextInputType.visiblePassword,
                           obscureText: true,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                           decoration: const InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
@@ -129,8 +127,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           focusNode: widget.textConfirmPasswordFocus,
                           keyboardType: TextInputType.visiblePassword,
                           obscureText: true,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                           decoration: const InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
@@ -152,8 +149,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           //유저네임 텍스트박스--------------------------------
                           controller: usernameInputController,
                           focusNode: widget.textUsernameFocus,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                           decoration: const InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
@@ -186,8 +182,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),
                         onPressed: () async {
-                          if (passwordInputController.text !=
-                              password2InputController.text) {
+                          if (passwordInputController.text != password2InputController.text) {
                             showDialog(
                               context: context,
                               builder: (context) {
@@ -198,9 +193,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             );
                           } else {
                             try {
-                              UserCredential userCredential = await FirebaseAuth
-                                  .instance
-                                  .createUserWithEmailAndPassword(
+                              UserCredential userCredential =
+                                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
                                 email: emailInputController.text,
                                 password: passwordInputController.text,
                               );
@@ -213,8 +207,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     'uid': userCredential.user!.uid,
                                   })
                                   .then((value) => print("User Added"))
-                                  .catchError((error) =>
-                                      print("Failed to add user: $error"));
+                                  .catchError((error) => print("Failed to add user: $error"));
                               String username = usernameInputController.text;
                               showDialog(
                                 context: context,
@@ -256,8 +249,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   context: context,
                                   builder: (context) {
                                     return const AlertDialog(
-                                      content:
-                                          Text("The password is too weak!"),
+                                      content: Text("The password is too weak!"),
                                     );
                                   },
                                 );
