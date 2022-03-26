@@ -17,6 +17,6 @@ class AddSessionPage extends StatefulWidget {
 class _AddSessionPageState extends State<AddSessionPage> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return MaterialApp(home: SafeArea(child: Scaffold(body: Center(child: Text("Add session page")))));
   }
 }
