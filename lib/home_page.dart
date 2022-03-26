@@ -1119,7 +1119,7 @@ class _DiscussState extends State<Discuss> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // Add your onPressed code here!
-          await navigatorKey.currentState?.pushNamed('/add_question_page');
+          await navigatorKey.currentState?.pushNamed('/add_session_page');
           setState(() {});
         },
         backgroundColor: Colors.white,
