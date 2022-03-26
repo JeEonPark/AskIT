@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ask_it/main.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:intl/intl.dart' as intl;
 
 import 'main.dart';
 
@@ -158,7 +159,6 @@ class _SessionViewPageState extends State<SessionViewPage> {
     )..layout(
         maxWidth: MediaQuery.of(context).size.width - 44,
       );
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -313,11 +313,15 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   ),
                                                 ),
 
-                                                //기간 텍스트(임시로 고정)
+                                                //기간 텍스트
                                                 Container(
                                                   padding: EdgeInsets.fromLTRB(24, 0, 0, 0),
                                                   child: Text(
-                                                    "2022.03.06 ~ 2022.04.10",
+                                                    intl.DateFormat('yyyy.MM.dd').format(
+                                                            snapshot.data.values.elementAt(0)?['date'].toDate()) +
+                                                        " ~ " +
+                                                        intl.DateFormat('yyyy.MM.dd').format(
+                                                            snapshot.data.values.elementAt(0)?['due_date'].toDate()),
                                                     style: TextStyle(
                                                       color: Color.fromARGB(153, 255, 255, 255),
                                                       fontSize: 15,
@@ -329,7 +333,14 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                 Container(
                                                   padding: EdgeInsets.fromLTRB(24, 5, 0, 0),
                                                   child: Text(
-                                                    "ended after 3 days",
+                                                    "ended after " +
+                                                        snapshot.data.values
+                                                            .elementAt(0)['due_date']
+                                                            .toDate()
+                                                            .difference(DateTime.now())
+                                                            .inDays
+                                                            .toString() +
+                                                        " days",
                                                     style: TextStyle(
                                                       color: Color.fromARGB(255, 255, 255, 255),
                                                       fontSize: 15,
