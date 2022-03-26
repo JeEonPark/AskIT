@@ -1217,8 +1217,24 @@ class _OtherState extends State<Other> {
                           width: 100,
                           child: Column(
                             children: [
-                              Text("Questions"),
-                              Text("6"),
+                              Text(
+                                "Questions",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                "6",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -1226,8 +1242,24 @@ class _OtherState extends State<Other> {
                           width: 100,
                           child: Column(
                             children: [
-                              Text("I Answered"),
-                              Text("12"),
+                              Text(
+                                "I Answered",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                "12",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -1235,8 +1267,24 @@ class _OtherState extends State<Other> {
                           width: 100,
                           child: Column(
                             children: [
-                              Text("Liked"),
-                              Text("57"),
+                              Text(
+                                "Liked",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                "57",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Montserrat",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ],
                           ),
                         ),
