@@ -486,6 +486,18 @@ Future gotoQuestionViewPage(String docId, String title, String texts,
       "date": DateFormat('yyyy.MM.dd hh:mm').format(date),
       "uid": uid,
     });
+  } else if (_currentIndex == 2) {
+    await navigatorKey.currentState?.pushNamed(
+      '/question_view_page',
+      arguments: {
+        "docId": docId,
+        "title": title,
+        "texts": texts,
+        "author": author,
+        "date": DateFormat('yyyy.MM.dd hh:mm').format(date),
+        "uid": uid,
+      },
+    );
   }
 }
 
@@ -1209,79 +1221,106 @@ class _OtherState extends State<Other> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 100,
-                          child: Column(
-                            children: [
-                              Text(
-                                "Questions",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                        GestureDetector(
+                          onTap: () {
+                            navigatorKey.currentState?.pushNamed(
+                                '/others_page_search_page',
+                                arguments: {"page": "questions"});
+                          },
+                          child: Container(
+                            color: const Color.fromARGB(255, 29, 30, 37),
+                            width: 100,
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Questions",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "6",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
+                                SizedBox(height: 6),
+                                Text(
+                                  "6",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                        Container(
-                          width: 100,
-                          child: Column(
-                            children: [
-                              Text(
-                                "I Answered",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                        GestureDetector(
+                          onTap: () {
+                            navigatorKey.currentState?.pushNamed(
+                                '/others_page_search_page',
+                                arguments: {"page": "ianswered"});
+                          },
+                          child: Container(
+                            color: const Color.fromARGB(255, 29, 30, 37),
+                            width: 100,
+                            child: Column(
+                              children: [
+                                Text(
+                                  "I Answered",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "12",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
+                                SizedBox(height: 6),
+                                Text(
+                                  "12",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                        Container(
-                          width: 100,
-                          child: Column(
-                            children: [
-                              Text(
-                                "Liked",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                        GestureDetector(
+                          onTap: () {
+                            navigatorKey.currentState?.pushNamed(
+                                '/others_page_search_page',
+                                arguments: {"page": "liked"});
+                          },
+                          child: Container(
+                            color: const Color.fromARGB(255, 29, 30, 37),
+                            width: 100,
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Liked",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "57",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
+                                SizedBox(height: 6),
+                                Text(
+                                  "57",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ],

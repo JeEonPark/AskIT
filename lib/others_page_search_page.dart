@@ -1,7 +1,12 @@
 import 'package:ask_it/home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'main.dart';
+import 'package:ask_it/main.dart';
+import 'home_page.dart';
 
 class OthersPageSearchPage extends StatefulWidget {
   OthersPageSearchPage({Key? key}) : super(key: key);
@@ -11,11 +16,16 @@ class OthersPageSearchPage extends StatefulWidget {
 }
 
 //#region Firebase 함수
-Future<List> getDocumentList(String searchData) async {
+//내 글 리스트 불러오기
+Future<List> getDocumentList() async {
   List<String> lists = [];
   QuerySnapshot snapshot = await FirebaseFirestore.instance
       .collection("AskPage_Questions")
-      .orderBy('date', descending: true) //검색한 것만 뽑아서 가져오게 해야 함!!!
+      .orderBy('date', descending: true)
+      .where(
+        'uid',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
       .get();
   snapshot.docs.forEach((element) {
     lists.add(element.id);
@@ -26,8 +36,8 @@ Future<List> getDocumentList(String searchData) async {
 }
 
 // Map<글 코드, 글 데이터맵>
-Future<Map> getDocument(String searchData) async {
-  List lists = await getDocumentList(searchData); //
+Future<Map> getDocument() async {
+  List lists = await getDocumentList(); //
   Map<String, Map<String, dynamic>?> map = {}; // {docid : [Map]}
 
   for (int i = 0; i < lists.length; i++) {
@@ -272,12 +282,9 @@ Widget second(String docId, String title, String texts, String author,
 
 class _OthersPageSearchPageState extends State<OthersPageSearchPage> {
   //변수
-  final searchInputController = TextEditingController();
-  FocusNode textSearchFocus = FocusNode();
-  bool isSearched = false;
-  String searchData = "";
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -291,128 +298,110 @@ class _OthersPageSearchPageState extends State<OthersPageSearchPage> {
                 Container(
                   height: 70,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       //뒤로가기 버튼
                       IconButton(
+                        padding: EdgeInsets.all(20),
                         onPressed: () {
                           Navigator.pop(context);
                         },
+                        icon: Icon(Icons.close),
+                        color: Colors.white,
                         iconSize: 35,
-                        icon: const Icon(
-                          Icons.close,
+                      ),
+                      //Answer 텍스트
+                      Text(
+                        args['page'] == 'questions' ? "Questions" : "f",
+                        style: const TextStyle(
+                          fontFamily: "Montserrat",
                           color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
                         ),
                       ),
                     ],
                   ),
                 ),
                 Expanded(
-                  child: isSearched
-                      ? FutureBuilder(
-                          future: getDocument(searchData),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.hasData == false) {
-                              return const Text("loading",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Montserrat',
-                                    fontSize: 20,
-                                  ));
-                              // ignore: dead_code
-                            } else {
-                              return RefreshIndicator(
-                                  onRefresh: () async {
-                                    setState(() {
-                                      getDocument(searchData);
-                                    });
-                                  },
-                                  child: SingleChildScrollView(
-                                    physics: AlwaysScrollableScrollPhysics(),
-                                    child: Column(
-                                      children: [
-                                        for (int i = 0;
-                                            i < snapshot.data.length;
-                                            i++)
-                                          i % 2 == 0
-                                              ? Column(
-                                                  children: [
-                                                    if (i == 0)
-                                                      SizedBox(height: 5),
-                                                    first(
-                                                      snapshot.data.keys
-                                                          .elementAt(i),
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['title'],
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['texts'],
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['author'],
-                                                      snapshot.data.values
-                                                          .elementAt(i)?['date']
-                                                          .toDate(),
-                                                      snapshot.data.values
-                                                          .elementAt(i)?['uid'],
-                                                    ),
-                                                    if (i ==
-                                                        snapshot.data.length -
-                                                            1)
-                                                      SizedBox(height: 5),
-                                                  ],
-                                                )
-                                              : Column(
-                                                  children: [
-                                                    second(
-                                                      snapshot.data.keys
-                                                          .elementAt(i),
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['title'],
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['texts'],
-                                                      snapshot.data.values
-                                                          .elementAt(
-                                                              i)?['author'],
-                                                      snapshot.data.values
-                                                          .elementAt(i)?['date']
-                                                          .toDate(),
-                                                      snapshot.data.values
-                                                          .elementAt(i)?['uid'],
-                                                    ),
-                                                    if (i ==
-                                                        snapshot.data.length -
-                                                            1)
-                                                      SizedBox(height: 5),
-                                                  ],
-                                                ),
-                                      ],
-                                    ),
-                                  ));
-                            }
-                          },
-                        )
-                      : const Center(
-                          child: Text(
-                            "Search Anything!",
+                  child: FutureBuilder(
+                    future: getDocument(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData == false) {
+                        return const Text("Loading...",
                             style: TextStyle(
                               color: Colors.white,
                               fontFamily: 'Montserrat',
                               fontSize: 20,
+                            ));
+                        // ignore: dead_code
+                      } else {
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            setState(() {
+                              getDocument();
+                            });
+                          },
+                          child: SingleChildScrollView(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            child: Column(
+                              children: [
+                                for (int i = 0; i < snapshot.data.length; i++)
+                                  i % 2 == 0
+                                      ? Column(
+                                          children: [
+                                            if (i == 0) SizedBox(height: 5),
+                                            first(
+                                              snapshot.data.keys.elementAt(i),
+                                              snapshot.data.values
+                                                  .elementAt(i)?['title'],
+                                              snapshot.data.values
+                                                  .elementAt(i)?['texts'],
+                                              snapshot.data.values
+                                                  .elementAt(i)?['author'],
+                                              snapshot.data.values
+                                                  .elementAt(i)?['date']
+                                                  .toDate(),
+                                              snapshot.data.values
+                                                  .elementAt(i)?['uid'],
+                                            ),
+                                            if (i == snapshot.data.length - 1)
+                                              SizedBox(height: 5),
+                                          ],
+                                        )
+                                      : Column(
+                                          children: [
+                                            second(
+                                              snapshot.data.keys.elementAt(i),
+                                              snapshot.data.values
+                                                  .elementAt(i)?['title'],
+                                              snapshot.data.values
+                                                  .elementAt(i)?['texts'],
+                                              snapshot.data.values
+                                                  .elementAt(i)?['author'],
+                                              snapshot.data.values
+                                                  .elementAt(i)?['date']
+                                                  .toDate(),
+                                              snapshot.data.values
+                                                  .elementAt(i)?['uid'],
+                                            ),
+                                            if (i == snapshot.data.length - 1)
+                                              SizedBox(height: 5),
+                                          ],
+                                        ),
+                              ],
                             ),
                           ),
-                        ),
-                )
+                        );
+                      }
+                    },
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
     );
-    ;
   }
 }
