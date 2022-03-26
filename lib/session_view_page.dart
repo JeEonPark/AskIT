@@ -42,6 +42,95 @@ Future<Map> getDocument(String docId) async {
   return map;
 }
 
+// joined에 내 uid 넣거나 빼기
+Future editJoinedArray(String docId) async {
+  //user uid 얻기
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("UserInformation")
+      .where(
+        'uid',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
+      .get();
+  String uid = snapshot.docs.first.get("uid");
+
+  //이 세션의 joined 리스트 얻기
+  DocumentSnapshot snapshot2 = await FirebaseFirestore.instance
+      .collection("DiscussPage_Sessions")
+      .doc(docId)
+      .get();
+
+  List joinedList = snapshot2.get('joined');
+  bool joined = joinedList.contains(FirebaseAuth.instance.currentUser?.uid);
+
+  if (joined) {
+    //참가했으면 리스트에서 빼기
+    await FirebaseFirestore.instance
+        .collection('DiscussPage_Sessions')
+        .doc(docId)
+        .update({
+          'joined': FieldValue.arrayRemove([uid]),
+        })
+        .then((value) => print("remove in joined list"))
+        .catchError((error) => print("Failed to add user: $error"));
+  } else {
+    //참가 안했으면 리스트에 넣기
+    await FirebaseFirestore.instance
+        .collection('DiscussPage_Sessions')
+        .doc(docId)
+        .update({
+          'joined': FieldValue.arrayUnion([uid]),
+        })
+        .then((value) => print("add in joined list"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
+}
+
+// liked에 내 uid 넣거나 빼기
+Future editLikedArray(String docId) async {
+  //user uid 얻기
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("UserInformation")
+      .where(
+        'uid',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
+      .get();
+  String uid = snapshot.docs.first.get("uid");
+
+  //이 세션의 liked 리스트 얻기
+  DocumentSnapshot snapshot2 = await FirebaseFirestore.instance
+      .collection("DiscussPage_Sessions")
+      .doc(docId)
+      .get();
+
+  List likedList = snapshot2.get('liked');
+  bool liked = likedList.contains(FirebaseAuth.instance.currentUser?.uid);
+  print(liked);
+
+  if (liked) {
+    //이미 좋아요 눌렀으면 리스트에서 빼기
+    await FirebaseFirestore.instance
+        .collection('DiscussPage_Sessions')
+        .doc(docId)
+        .update({
+          'liked': FieldValue.arrayRemove([uid]),
+        })
+        .then((value) => print("remove in liked list"))
+        .catchError((error) => print("Failed to add user: $error"));
+  } else {
+    //좋아요 안 눌렀으면 리스트에 넣기
+    await FirebaseFirestore.instance
+        .collection('DiscussPage_Sessions')
+        .doc(docId)
+        .update({
+          'liked': FieldValue.arrayUnion([uid]),
+        })
+        .then((value) => print("add in liked list"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
+}
+
 class _SessionViewPageState extends State<SessionViewPage> {
   //변수들
   int pageSelected = 1;
@@ -83,7 +172,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
     )..layout(
         maxWidth: MediaQuery.of(context).size.width - 44,
       );
-    print(textPainter.size);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -588,24 +677,32 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                         color: Colors.white),
                                     Expanded(
                                       child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          SizedBox(width: 20),
-                                          //하트(안눌렀을때, 눌렀을때 색깔 변화 나중에 넣기)
+                                          Spacer(),
+                                          //하트
                                           SizedBox(
                                             height: 35,
                                             child: IconButton(
                                               splashRadius: 10,
                                               iconSize: 35,
                                               padding: EdgeInsets.all(0),
-                                              onPressed: () {
-                                                setState(() {
-                                                  //안눌렀으면 liked에서 내 이름 넣기
-                                                  //이미 눌렀으면 liked에서 내 이름 빼기
-                                                });
+                                              onPressed: () async {
+                                                await editLikedArray(
+                                                    args['docId']);
+                                                setState(() {});
                                               },
                                               icon: Icon(
-                                                Icons.favorite,
-                                                color: (!snapshot.data.values
+                                                (!snapshot.data.values
+                                                        .elementAt(0)['liked']
+                                                        .contains(FirebaseAuth
+                                                            .instance
+                                                            .currentUser
+                                                            ?.uid))
+                                                    ? Icons.favorite_border
+                                                    : Icons.favorite,
+                                                color: (snapshot.data.values
                                                         .elementAt(0)['liked']
                                                         .contains(FirebaseAuth
                                                             .instance
@@ -619,13 +716,15 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                           ),
                                           //좋아요 수
                                           Container(
-                                            padding: EdgeInsets.fromLTRB(
-                                                10, 0, 0, 0),
+                                            alignment: Alignment.center,
+                                            margin:
+                                                EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                            width: 40,
                                             child: Text(
-                                              snapshot.data.values
+                                              (snapshot.data.values
                                                   .elementAt(0)['liked']
                                                   .length
-                                                  .toString(),
+                                                  .toString()),
                                               style: TextStyle(
                                                 color: Color.fromARGB(
                                                     255, 255, 255, 255),
@@ -637,11 +736,15 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                           //Join this session 버튼(join 누르면 joined 리스트에 내가 추가됨. join 안했으면 반대)
                                           Container(
                                             padding: EdgeInsets.fromLTRB(
-                                                20, 0, 0, 0),
+                                                10, 0, 0, 0),
                                             height: 40,
                                             width: 280,
                                             child: ElevatedButton.icon(
-                                              onPressed: () {},
+                                              onPressed: () async {
+                                                await editJoinedArray(
+                                                    args['docId']);
+                                                setState(() {});
+                                              },
                                               style: ElevatedButton.styleFrom(
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
@@ -706,6 +809,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                     ),
                                             ),
                                           ),
+                                          Spacer(),
                                         ],
                                       ),
                                     ),
