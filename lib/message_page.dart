@@ -8,7 +8,6 @@ class MessagePage extends StatefulWidget {
 
   @override
   State<MessagePage> createState() => _MessagePageState();
-  FocusNode textFocus = FocusNode();
 }
 
 //내 채팅 입력
@@ -142,13 +141,14 @@ Future<Map> getDocument(String questionDocId) async {
 
 class _MessagePageState extends State<MessagePage> {
   final textController = TextEditingController();
+  FocusNode textFocus = FocusNode();
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     return GestureDetector(
       //배경 누르면 포커스 해제
       onTap: () {
-        widget.textFocus.unfocus();
+        FocusScope.of(context).unfocus();
       },
       child: SafeArea(
         child: MaterialApp(
@@ -168,7 +168,7 @@ class _MessagePageState extends State<MessagePage> {
                       IconButton(
                         padding: EdgeInsets.all(20),
                         onPressed: () {
-                          widget.textFocus.unfocus();
+                          textFocus.unfocus();
                           Navigator.pop(context);
                         },
                         icon: Icon(Icons.arrow_back_rounded),
@@ -284,7 +284,7 @@ class _MessagePageState extends State<MessagePage> {
                         width: MediaQuery.of(context).size.width * 0.7,
                         child: TextFormField(
                           controller: textController,
-                          focusNode: widget.textFocus,
+                          focusNode: textFocus,
                           style: const TextStyle(fontSize: 14, color: Colors.black),
                           decoration: InputDecoration(
                             isDense: true,
@@ -295,7 +295,7 @@ class _MessagePageState extends State<MessagePage> {
                             ),
                             fillColor: Colors.white,
                             filled: true,
-                            hintText: "Search",
+                            hintText: "Message...",
                             hintStyle: const TextStyle(
                               color: Color.fromARGB(255, 125, 125, 125),
                               fontFamily: 'Montserrat',

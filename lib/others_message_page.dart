@@ -8,7 +8,6 @@ class OthersMessagePage extends StatefulWidget {
 
   @override
   State<OthersMessagePage> createState() => _OthersMessagePageState();
-  FocusNode textFocus = FocusNode();
 }
 
 //내 채팅 입력
@@ -129,203 +128,209 @@ Future<String> getUsernamebyUid(String uid) async {
 
 class _OthersMessagePageState extends State<OthersMessagePage> {
   final textController = TextEditingController();
+  FocusNode textFocus = FocusNode();
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     return SafeArea(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          backgroundColor: const Color.fromARGB(255, 29, 30, 37),
-          body: Column(
-            // 상단바 영역
-            children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                width: MediaQuery.of(context).size.width,
-                height: 80,
-                child: Row(
-                  children: [
-                    //뒤로가기 버튼
-                    IconButton(
-                      padding: EdgeInsets.all(20),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(Icons.arrow_back_rounded),
-                      color: Colors.white,
-                      iconSize: 35,
-                    ),
-                    //Answer 텍스트
-                    const Text(
-                      "Answer",
-                      style: TextStyle(
-                        fontFamily: "Montserrat",
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              //메시지 영역-----------------------------------------------
-              Expanded(
-                child: Container(
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: Scaffold(
+            backgroundColor: const Color.fromARGB(255, 29, 30, 37),
+            body: Column(
+              // 상단바 영역
+              children: [
+                Container(
+                  alignment: Alignment.centerLeft,
                   width: MediaQuery.of(context).size.width,
-                  child: StreamBuilder(
-                      stream: chattingStream(args["docId"], args["chatRoomUid"]),
-                      builder: (BuildContext context, AsyncSnapshot streamsnapshot) {
-                        if (streamsnapshot.connectionState == ConnectionState.waiting) {
-                          //데이터 받아오는중
-                          return Container(
-                            alignment: Alignment.center,
-                            child: Text(
-                              "Loading...",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "Montserrat",
-                              ),
-                            ),
-                          );
-                        } else {
-                          // Map snapshotMap = snapshot.data as Map;
-                          return FutureBuilder(
-                              future: getDocument(args['docId'], args['chatRoomUid']),
-                              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                if (snapshot.hasData == false) {
-                                  return Container(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      "Loading...",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: "Montserrat",
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  Map snapshotMap = snapshot.data;
-                                  return SingleChildScrollView(
-                                    reverse: true,
-                                    child: Column(
-                                      children: [
-                                        for (int i = 0; i < snapshotMap.length; i++)
-                                          // 내가 보낸 채팅일 경우
-                                          if (snapshotMap.values.elementAt(i)["sender_uid"] ==
-                                              FirebaseAuth.instance.currentUser?.uid)
-                                            MessageFromRight(
-                                                snapshotMap.values.elementAt(i)["texts"],
-                                                snapshotMap.values.elementAt(i)["date"].toDate(),
-                                                snapshotMap.values.elementAt(i)["username"])
-                                          // 상대가 보낸 채팅일 경우
-                                          else
-                                            MessageFromLeft(
-                                                snapshotMap.values.elementAt(i)["texts"],
-                                                snapshotMap.values.elementAt(i)["date"].toDate(),
-                                                snapshotMap.values.elementAt(i)["username"])
-                                      ],
-                                    ),
-                                  );
-                                }
-                              });
-                        }
-                      }),
-                ),
-              ),
-              //하단바 영역-----------------------------------------------
-              Container(
-                height: 60,
-                //구분선
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Colors.white, width: 1),
+                  height: 80,
+                  child: Row(
+                    children: [
+                      //뒤로가기 버튼
+                      IconButton(
+                        padding: EdgeInsets.all(20),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.arrow_back_rounded),
+                        color: Colors.white,
+                        iconSize: 35,
+                      ),
+                      //Answer 텍스트
+                      const Text(
+                        "Answer",
+                        style: TextStyle(
+                          fontFamily: "Montserrat",
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                //하단바
-                child: args["uid"] == FirebaseAuth.instance.currentUser?.uid
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (args["uid"] == FirebaseAuth.instance.currentUser?.uid)
-                            SizedBox(
-                              width: 10,
-                            ),
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            splashRadius: 25,
-                            iconSize: 30,
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.photo_camera_outlined,
-                              color: Colors.white,
-                            ),
-                          ),
-                          //메시지 입력창
-                          Spacer(),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            child: TextFormField(
-                              controller: textController,
-                              focusNode: widget.textFocus,
-                              style: const TextStyle(fontSize: 14, color: Colors.black),
-                              decoration: InputDecoration(
-                                isDense: true,
-                                contentPadding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                fillColor: Colors.white,
-                                filled: true,
-                                hintText: "Search",
-                                hintStyle: const TextStyle(
-                                  color: Color.fromARGB(255, 125, 125, 125),
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Spacer(),
-                          Row(
-                            children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                splashRadius: 25,
-                                iconSize: 30,
-                                onPressed: () {
-                                  writeChatting(args['docId'], textController.text, args['chatRoomUid']);
-                                  textController.clear();
-                                },
-                                icon: Icon(
-                                  Icons.send_outlined,
+                //메시지 영역-----------------------------------------------
+                Expanded(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: StreamBuilder(
+                        stream: chattingStream(args["docId"], args["chatRoomUid"]),
+                        builder: (BuildContext context, AsyncSnapshot streamsnapshot) {
+                          if (streamsnapshot.connectionState == ConnectionState.waiting) {
+                            //데이터 받아오는중
+                            return Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Loading...",
+                                style: TextStyle(
                                   color: Colors.white,
+                                  fontFamily: "Montserrat",
                                 ),
                               ),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                        ],
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Read Only",
-                            style: TextStyle(
-                              fontFamily: "Montserrat",
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                            );
+                          } else {
+                            // Map snapshotMap = snapshot.data as Map;
+                            return FutureBuilder(
+                                future: getDocument(args['docId'], args['chatRoomUid']),
+                                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                  if (snapshot.hasData == false) {
+                                    return Container(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Loading...",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: "Montserrat",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    Map snapshotMap = snapshot.data;
+                                    return SingleChildScrollView(
+                                      reverse: true,
+                                      child: Column(
+                                        children: [
+                                          for (int i = 0; i < snapshotMap.length; i++)
+                                            // 내가 보낸 채팅일 경우
+                                            if (snapshotMap.values.elementAt(i)["sender_uid"] ==
+                                                FirebaseAuth.instance.currentUser?.uid)
+                                              MessageFromRight(
+                                                  snapshotMap.values.elementAt(i)["texts"],
+                                                  snapshotMap.values.elementAt(i)["date"].toDate(),
+                                                  snapshotMap.values.elementAt(i)["username"])
+                                            // 상대가 보낸 채팅일 경우
+                                            else
+                                              MessageFromLeft(
+                                                  snapshotMap.values.elementAt(i)["texts"],
+                                                  snapshotMap.values.elementAt(i)["date"].toDate(),
+                                                  snapshotMap.values.elementAt(i)["username"])
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                });
+                          }
+                        }),
+                  ),
+                ),
+                //하단바 영역-----------------------------------------------
+                Container(
+                  height: 60,
+                  //구분선
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: Colors.white, width: 1),
+                    ),
+                  ),
+                  //하단바
+                  child: args["uid"] == FirebaseAuth.instance.currentUser?.uid
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (args["uid"] == FirebaseAuth.instance.currentUser?.uid)
+                              SizedBox(
+                                width: 10,
+                              ),
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              splashRadius: 25,
+                              iconSize: 30,
+                              onPressed: () {},
+                              icon: Icon(
+                                Icons.photo_camera_outlined,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-              ),
-            ],
+                            //메시지 입력창
+                            Spacer(),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.7,
+                              child: TextFormField(
+                                controller: textController,
+                                focusNode: textFocus,
+                                style: const TextStyle(fontSize: 14, color: Colors.black),
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  hintText: "Search",
+                                  hintStyle: const TextStyle(
+                                    color: Color.fromARGB(255, 125, 125, 125),
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Spacer(),
+                            Row(
+                              children: [
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  splashRadius: 25,
+                                  iconSize: 30,
+                                  onPressed: () {
+                                    writeChatting(args['docId'], textController.text, args['chatRoomUid']);
+                                    textController.clear();
+                                  },
+                                  icon: Icon(
+                                    Icons.send_outlined,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Read Only",
+                              style: TextStyle(
+                                fontFamily: "Montserrat",
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

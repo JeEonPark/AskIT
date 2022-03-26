@@ -14,6 +14,23 @@ class SessionViewPage extends StatefulWidget {
   State<SessionViewPage> createState() => _SessionViewPageState();
 }
 
+//내 채팅 입력
+void writeChatting(String docId, String texts) async {
+  await FirebaseFirestore.instance
+      .collection('DiscussPage_Sessions')
+      .doc(docId)
+      .collection('Messages')
+      .doc()
+      .set({
+        'texts': texts,
+        'date': Timestamp.now(),
+        'sender_uid': FirebaseAuth.instance.currentUser?.uid,
+      })
+      .then((value) => print("Sent"))
+      .catchError((error) => print("Failed to add user: $error"));
+}
+
+//
 Future<List> getDocumnetList(String docId) async {
   List<String> lists = [];
 
@@ -22,6 +39,47 @@ Future<List> getDocumnetList(String docId) async {
   lists.add(snapshot.id);
 
   return lists;
+}
+
+//uid로 닉네임 불러오기
+Future<String> getUsernamebyUid(String uid) async {
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("UserInformation")
+      .where(
+        'uid',
+        isEqualTo: uid,
+      )
+      .get();
+
+  return snapshot.docs.elementAt(0)["username"];
+}
+
+//채팅방 uid 닉네임 맵 매치
+Future<Map> getChatroomUidUsername(String docId) async {
+  Map maps = {};
+  //질문 올린 사람 uid 닉네임 매치
+  DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(docId).get();
+  List joinedList = snapshot.get('joined');
+
+  for (var element in joinedList) {
+    maps[element] = await getUsernamebyUid(element.toString());
+  }
+
+  return maps;
+}
+
+// 채팅 스트림
+Stream chattingStream(String docId) async* {
+  Stream<QuerySnapshot> snapshot = FirebaseFirestore.instance
+      .collection("DiscussPage_Sessions")
+      .doc(docId)
+      .collection("Messages")
+      .orderBy('date', descending: false)
+      .snapshots();
+  // snapshot.docs.forEach((element) {
+  //   lists.add(element.id);
+  // });
+  yield* snapshot;
 }
 
 // Map<글 코드, 글 데이터맵>
@@ -122,6 +180,7 @@ Future editLikedArray(String docId) async {
 class _SessionViewPageState extends State<SessionViewPage> {
   //변수들
   int pageSelected = 1;
+  FocusNode textFocus = FocusNode();
   @override
   // void initState() {
   //   super.initState();
@@ -145,6 +204,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
+    final textController = TextEditingController();
     final TextPainter textPainter = TextPainter(
       textDirection: TextDirection.ltr,
       text: TextSpan(
@@ -159,72 +219,70 @@ class _SessionViewPageState extends State<SessionViewPage> {
     )..layout(
         maxWidth: MediaQuery.of(context).size.width - 44,
       );
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 29, 30, 37),
-        body: SafeArea(
-          //앱 전체 감싸는 div
-          child: Column(
-            children: [
-              //상단바 div
-              Container(
-                height: 70,
-                child: Row(
-                  children: [
-                    //뒤로가기 버튼
-                    IconButton(
-                      padding: EdgeInsets.all(20),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      iconSize: 35,
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: const Color.fromARGB(255, 29, 30, 37),
+          body: SafeArea(
+            //앱 전체 감싸는 div
+            child: Column(
+              children: [
+                //상단바 div
+                Container(
+                  height: 70,
+                  child: Row(
+                    children: [
+                      //뒤로가기 버튼
+                      IconButton(
+                        padding: EdgeInsets.all(20),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        iconSize: 35,
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    Spacer(),
-                    //scratch pad 버튼
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      iconSize: 35,
-                      icon: const Icon(
-                        Icons.sticky_note_2_outlined,
-                        color: Colors.white,
+                      Spacer(),
+                      //scratch pad 버튼
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        iconSize: 35,
+                        icon: const Icon(
+                          Icons.sticky_note_2_outlined,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    //참가자목록 버튼
-                    IconButton(
-                      padding: EdgeInsets.fromLTRB(10, 0, 20, 0),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      iconSize: 35,
-                      icon: const Icon(
-                        Icons.people_outline_rounded,
-                        color: Colors.white,
+                      //참가자목록 버튼
+                      IconButton(
+                        padding: EdgeInsets.fromLTRB(10, 0, 20, 0),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        iconSize: 35,
+                        icon: const Icon(
+                          Icons.people_outline_rounded,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: FutureBuilder(
-                    future: getDocument(args['docId']),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (snapshot.hasData == false) {
-                        return Text("loading");
-                      } else {
-                        return RefreshIndicator(
-                          onRefresh: () async {
-                            setState(() {
-                              getDocument('docId');
-                            });
-                          },
-                          child: Column(
+                Expanded(
+                  child: FutureBuilder(
+                      future: getDocument(args['docId']),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData == false) {
+                          return Text("Loading...");
+                        } else {
+                          return Column(
                             children: [
                               Expanded(
                                 child: Column(
@@ -242,7 +300,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   padding: EdgeInsets.fromLTRB(24, 0, 20, 0),
                                                   child: Text(
                                                     snapshot.data.values.elementAt(0)?['title'],
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 24,
                                                       fontWeight: FontWeight.bold,
@@ -273,7 +331,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                                 padding: EdgeInsets.fromLTRB(20, 2, 0, 0),
                                                                 child: Text(
                                                                   snapshot.data.values.elementAt(0)?['author'],
-                                                                  style: TextStyle(
+                                                                  style: const TextStyle(
                                                                     color: Colors.white,
                                                                     fontSize: 16,
                                                                     fontFamily: 'Montserrat',
@@ -426,6 +484,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   ),
                                                 ),
                                                 onPressed: () {
+                                                  FocusScope.of(context).unfocus();
                                                   setState(() {
                                                     pageSelected = 2;
                                                   });
@@ -520,18 +579,64 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                     if (pageSelected == 2)
                                       //Community 화면
                                       Expanded(
-                                        child: Center(
-                                          child: Text(
-                                            "Community",
-                                            style: TextStyle(
-                                              height: 1.8,
-                                              color: Color.fromARGB(255, 255, 255, 255),
-                                              fontSize: 15,
-                                              fontFamily: 'Montserrat',
+                                        child: Container(
+                                          child: SingleChildScrollView(
+                                            reverse: true,
+                                            child: Column(
+                                              children: [
+                                                StreamBuilder(
+                                                    stream: chattingStream(args["docId"]),
+                                                    builder: (context, AsyncSnapshot snapshot) {
+                                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                                        return Container(
+                                                          height: 100,
+                                                          alignment: Alignment.center,
+                                                          child: const Text(
+                                                            "Loading...",
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontFamily: "Montserrat",
+                                                            ),
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        List snapshotList = snapshot.data.docs;
+                                                        return FutureBuilder<Object>(
+                                                            future: getChatroomUidUsername(args["docId"]),
+                                                            builder: (context, AsyncSnapshot futureSnapshot) {
+                                                              if (futureSnapshot.hasData == false) {
+                                                                return Container(
+                                                                  height: 100,
+                                                                  alignment: Alignment.center,
+                                                                  child: const Text(
+                                                                    "Loading...",
+                                                                    style: TextStyle(
+                                                                      color: Colors.white,
+                                                                      fontFamily: "Montserrat",
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              } else {
+                                                                Map futureSnapshotMap = futureSnapshot.data;
+                                                                return Column(
+                                                                  children: [
+                                                                    for (int i = 0; i < snapshotList.length; i++)
+                                                                      message(
+                                                                          futureSnapshotMap[snapshotList[i]
+                                                                              ["sender_uid"]],
+                                                                          snapshotList[i]["texts"])
+                                                                  ],
+                                                                );
+                                                              }
+                                                            });
+                                                      }
+                                                    }),
+                                              ],
                                             ),
                                           ),
                                         ),
                                       ),
+
                                     if (pageSelected == 3)
                                       //Live 화면
                                       Expanded(
@@ -556,118 +661,252 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                 height: 60,
                                 child: Column(
                                   children: [
+                                    //가로줄 Container
                                     Container(height: 1, width: MediaQuery.of(context).size.width, color: Colors.white),
                                     Expanded(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Spacer(),
-                                          //하트
-                                          SizedBox(
-                                            height: 35,
-                                            child: IconButton(
-                                              splashRadius: 10,
-                                              iconSize: 35,
-                                              padding: EdgeInsets.all(0),
-                                              onPressed: () async {
-                                                await editLikedArray(args['docId']);
-                                                setState(() {});
-                                              },
-                                              icon: Icon(
-                                                (!snapshot.data.values
-                                                        .elementAt(0)['liked']
-                                                        .contains(FirebaseAuth.instance.currentUser?.uid))
-                                                    ? Icons.favorite_border
-                                                    : Icons.favorite,
-                                                color: (snapshot.data.values
-                                                        .elementAt(0)['liked']
-                                                        .contains(FirebaseAuth.instance.currentUser?.uid))
-                                                    ? Color.fromARGB(255, 206, 55, 55)
-                                                    : Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                          //좋아요 수
-                                          Container(
-                                            alignment: Alignment.center,
-                                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                            width: 40,
-                                            child: Text(
-                                              (snapshot.data.values.elementAt(0)['liked'].length.toString()),
-                                              style: TextStyle(
-                                                color: Color.fromARGB(255, 255, 255, 255),
-                                                fontSize: 18,
-                                                fontFamily: 'Montserrat',
-                                              ),
-                                            ),
-                                          ),
-                                          //Join this session 버튼(join 누르면 joined 리스트에 내가 추가됨. join 안했으면 반대)
-                                          Container(
-                                            padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                            height: 40,
-                                            width: 280,
-                                            child: ElevatedButton.icon(
-                                              onPressed: () async {
-                                                await editJoinedArray(args['docId']);
-                                                setState(() {});
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                                primary: (snapshot.data.values.elementAt(0)['uid'] !=
-                                                        FirebaseAuth.instance.currentUser?.uid)
-                                                    ? Colors.white
-                                                    : Color.fromARGB(255, 108, 103, 103),
-                                              ),
-                                              icon: Icon(
-                                                Icons.question_answer,
-                                                color: (snapshot.data.values.elementAt(0)['uid'] !=
-                                                        FirebaseAuth.instance.currentUser?.uid)
-                                                    ? Colors.black
-                                                    : Color.fromARGB(127, 255, 255, 255),
-                                              ),
-                                              label: (!snapshot.data.values
-                                                      .elementAt(0)['joined']
-                                                      .contains(FirebaseAuth.instance.currentUser?.uid))
-                                                  ? Text(
-                                                      "Join this Session",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 18,
-                                                        fontFamily: 'Montserrat',
-                                                      ),
-                                                    )
-                                                  : Text(
-                                                      "Leave this Session",
-                                                      style: TextStyle(
-                                                        color: (snapshot.data.values.elementAt(0)['uid'] !=
-                                                                FirebaseAuth.instance.currentUser?.uid)
-                                                            ? Colors.black
-                                                            : Color.fromARGB(127, 255, 255, 255),
-                                                        fontSize: 18,
-                                                        fontFamily: 'Montserrat',
+                                      child: pageSelected == 2
+                                          ? Container(
+                                              height: 60,
+                                              //하단바
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  IconButton(
+                                                    padding: EdgeInsets.zero,
+                                                    splashRadius: 25,
+                                                    iconSize: 30,
+                                                    onPressed: () {},
+                                                    icon: Icon(
+                                                      Icons.photo_camera_outlined,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  //메시지 입력창
+                                                  Spacer(),
+                                                  SizedBox(
+                                                    width: MediaQuery.of(context).size.width * 0.7,
+                                                    child: TextFormField(
+                                                      controller: textController,
+                                                      focusNode: textFocus,
+                                                      style: const TextStyle(fontSize: 14, color: Colors.black),
+                                                      decoration: InputDecoration(
+                                                        isDense: true,
+                                                        contentPadding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+                                                        border: OutlineInputBorder(
+                                                          borderSide: BorderSide.none,
+                                                          borderRadius: BorderRadius.circular(20),
+                                                        ),
+                                                        fillColor: Colors.white,
+                                                        filled: true,
+                                                        hintText: "Message...",
+                                                        hintStyle: const TextStyle(
+                                                          color: Color.fromARGB(255, 125, 125, 125),
+                                                          fontFamily: 'Montserrat',
+                                                          fontSize: 14,
+                                                        ),
                                                       ),
                                                     ),
+                                                  ),
+                                                  Spacer(),
+                                                  Row(
+                                                    children: [
+                                                      IconButton(
+                                                        padding: EdgeInsets.zero,
+                                                        splashRadius: 25,
+                                                        iconSize: 30,
+                                                        onPressed: () {
+                                                          writeChatting(args['docId'], textController.text);
+                                                          textController.clear();
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.send_outlined,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Spacer(),
+                                                //하트
+                                                SizedBox(
+                                                  height: 35,
+                                                  child: IconButton(
+                                                    splashRadius: 10,
+                                                    iconSize: 35,
+                                                    padding: EdgeInsets.all(0),
+                                                    onPressed: () async {
+                                                      await editLikedArray(args['docId']);
+                                                      setState(() {});
+                                                    },
+                                                    icon: Icon(
+                                                      (!snapshot.data.values
+                                                              .elementAt(0)['liked']
+                                                              .contains(FirebaseAuth.instance.currentUser?.uid))
+                                                          ? Icons.favorite_border
+                                                          : Icons.favorite,
+                                                      color: (snapshot.data.values
+                                                              .elementAt(0)['liked']
+                                                              .contains(FirebaseAuth.instance.currentUser?.uid))
+                                                          ? Color.fromARGB(255, 206, 55, 55)
+                                                          : Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                //좋아요 수
+                                                Container(
+                                                  alignment: Alignment.center,
+                                                  margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                  width: 40,
+                                                  child: Text(
+                                                    (snapshot.data.values.elementAt(0)['liked'].length.toString()),
+                                                    style: TextStyle(
+                                                      color: Color.fromARGB(255, 255, 255, 255),
+                                                      fontSize: 18,
+                                                      fontFamily: 'Montserrat',
+                                                    ),
+                                                  ),
+                                                ),
+                                                //Join this session 버튼(join 누르면 joined 리스트에 내가 추가됨. join 안했으면 반대)
+                                                Container(
+                                                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                                  height: 40,
+                                                  width: 280,
+                                                  child: ElevatedButton.icon(
+                                                    onPressed: () async {
+                                                      await editJoinedArray(args['docId']);
+                                                      setState(() {});
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(20),
+                                                      ),
+                                                      primary: (snapshot.data.values.elementAt(0)['uid'] !=
+                                                              FirebaseAuth.instance.currentUser?.uid)
+                                                          ? Colors.white
+                                                          : Color.fromARGB(255, 108, 103, 103),
+                                                    ),
+                                                    icon: Icon(
+                                                      Icons.question_answer,
+                                                      color: (snapshot.data.values.elementAt(0)['uid'] !=
+                                                              FirebaseAuth.instance.currentUser?.uid)
+                                                          ? Colors.black
+                                                          : Color.fromARGB(127, 255, 255, 255),
+                                                    ),
+                                                    label: (!snapshot.data.values
+                                                            .elementAt(0)['joined']
+                                                            .contains(FirebaseAuth.instance.currentUser?.uid))
+                                                        ? Text(
+                                                            "Join this Session",
+                                                            style: TextStyle(
+                                                              color: Colors.black,
+                                                              fontSize: 18,
+                                                              fontFamily: 'Montserrat',
+                                                            ),
+                                                          )
+                                                        : Text(
+                                                            "Leave this Session",
+                                                            style: TextStyle(
+                                                              color: (snapshot.data.values.elementAt(0)['uid'] !=
+                                                                      FirebaseAuth.instance.currentUser?.uid)
+                                                                  ? Colors.black
+                                                                  : Color.fromARGB(127, 255, 255, 255),
+                                                              fontSize: 18,
+                                                              fontFamily: 'Montserrat',
+                                                            ),
+                                                          ),
+                                                  ),
+                                                ),
+                                                Spacer(),
+                                              ],
                                             ),
-                                          ),
-                                          Spacer(),
-                                        ],
-                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                             ],
-                          ),
-                        );
-                      }
-                    }),
-              ),
-            ],
+                          );
+                        }
+                      }),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+Widget message(String username, String texts) {
+  return //대화 내용
+      Container(
+    width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width,
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(width: 20),
+        //프로필 사진
+        Column(
+          children: [
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 1.5)),
+              child: Icon(Icons.person_outline, color: Colors.white, size: 34),
+            ),
+          ],
+        ),
+        SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Text(
+                  username,
+                  style: TextStyle(
+                    fontFamily: "Montserrat",
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  "22/03/27 at 15:33",
+                  style: TextStyle(
+                    fontFamily: "Montserrat",
+                    fontSize: 10,
+                    fontWeight: FontWeight.w300,
+                    color: Color.fromARGB(100, 255, 255, 255),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width - 85,
+              child: RichText(
+                text: TextSpan(
+                  text: texts,
+                  style: TextStyle(fontFamily: "Montserrat", fontSize: 15, color: Colors.white),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+          ],
+        ),
+      ],
+    ),
+  );
 }
