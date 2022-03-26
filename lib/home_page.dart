@@ -8,8 +8,10 @@ import 'package:ask_it/main.dart';
 
 //안녕하세요
 //박무바보
+//바보바보
 //전역변수
 //#region 변수
+
 int askPageSelected = 1;
 int discussPageSelected = 1;
 int _currentIndex = 0;
