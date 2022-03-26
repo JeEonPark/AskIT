@@ -547,11 +547,7 @@ class _AskState extends State<Ask> {
                             ),
                             //설정버튼
                             IconButton(
-                              onPressed: () async {
-                                navigatorKey.currentState?.pop(context);
-                                navigatorKey.currentState?.pushNamed('/');
-                                await FirebaseAuth.instance.signOut();
-                              },
+                              onPressed: () {},
                               iconSize: 35,
                               icon: const Icon(
                                 Icons.settings_outlined,
@@ -1172,8 +1168,8 @@ class _OtherState extends State<Other> {
                   ],
                 ),
               ),
-              //#endregion
               SizedBox(height: 20),
+              //#endregion
               //#region 프로필 영역 Container
               Container(
                 height: 200,
@@ -1294,6 +1290,134 @@ class _OtherState extends State<Other> {
                 ),
               ),
               //#endregion
+              //#region 메뉴 목록
+              Column(
+                children: [
+                  //My Profile 메뉴
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(46, 255, 255, 255),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Spacer(flex: 1),
+                        Text(
+                          "My Profile",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Montserrat",
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Spacer(flex: 10),
+                        Icon(
+                          Icons.chevron_right_outlined,
+                          color: Colors.white,
+                        ),
+                        Spacer(flex: 1),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  //Settings 메뉴
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(46, 255, 255, 255),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Spacer(flex: 1),
+                        Text(
+                          "Settings",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Montserrat",
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Spacer(flex: 10),
+                        Icon(
+                          Icons.chevron_right_outlined,
+                          color: Colors.white,
+                        ),
+                        Spacer(flex: 1),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  //About 메뉴
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(46, 255, 255, 255),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Spacer(flex: 1),
+                        Text(
+                          "About",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Montserrat",
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Spacer(flex: 10),
+                        Icon(
+                          Icons.chevron_right_outlined,
+                          color: Colors.white,
+                        ),
+                        Spacer(flex: 1),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              //#endregion
+              //#region 로그아웃 버튼
+              Spacer(),
+              GestureDetector(
+                onTap: () async {
+                  navigatorKey.currentState?.pop(context);
+                  navigatorKey.currentState?.pushNamed('/');
+                  await FirebaseAuth.instance.signOut();
+                  _currentIndex = 1;
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 127, 116, 255),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    "Sign Out",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Montserrat",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 40),
+              //#endregion 로그아웃 버튼
             ],
           ),
         ),

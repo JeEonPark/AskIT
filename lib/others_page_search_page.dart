@@ -1,19 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:ask_it/home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'home_page.dart';
-import 'main.dart';
-import 'package:ask_it/main.dart';
+class OthersPageSearchPage extends StatefulWidget {
+  OthersPageSearchPage({Key? key}) : super(key: key);
 
-class SearchPage extends StatefulWidget {
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<OthersPageSearchPage> createState() => _OthersPageSearchPageState();
 }
 
 //#region Firebase 함수
-
 Future<List> getDocumentList(String searchData) async {
   List<String> lists = [];
   QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -270,15 +267,15 @@ Widget second(String docId, String title, String texts, String author,
     ),
   );
 }
+
 //#endregion First, Second 위젯
 
-class _SearchPageState extends State<SearchPage> {
+class _OthersPageSearchPageState extends State<OthersPageSearchPage> {
   //변수
   final searchInputController = TextEditingController();
   FocusNode textSearchFocus = FocusNode();
   bool isSearched = false;
   String searchData = "";
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -304,48 +301,6 @@ class _SearchPageState extends State<SearchPage> {
                         iconSize: 35,
                         icon: const Icon(
                           Icons.close,
-                          color: Colors.white,
-                        ),
-                      ),
-                      //검색바
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        child: TextFormField(
-                          controller: searchInputController,
-                          focusNode: textSearchFocus,
-                          style: const TextStyle(
-                              fontSize: 20, color: Colors.black),
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding:
-                                const EdgeInsets.fromLTRB(14, 8, 14, 8),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            fillColor: Colors.white,
-                            filled: true,
-                            hintText: "Search",
-                            hintStyle: const TextStyle(
-                              color: Color.fromARGB(255, 125, 125, 125),
-                              fontFamily: 'Montserrat',
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                      //검색 버튼
-                      IconButton(
-                        onPressed: () {
-                          //누르면 검색 결과 넣어야 함
-                          setState(() {
-                            isSearched = true;
-                            searchData = searchInputController.text;
-                          });
-                        },
-                        iconSize: 35,
-                        icon: const Icon(
-                          Icons.search,
                           color: Colors.white,
                         ),
                       ),
@@ -458,5 +413,6 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ),
     );
+    ;
   }
 }
