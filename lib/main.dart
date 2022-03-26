@@ -25,6 +25,7 @@ import 'ask_answer_method_page.dart';
 import 'message_page.dart';
 import 'session_view_page.dart';
 import 'others_message_page.dart';
+import 'add_session_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -52,6 +53,7 @@ void main() async {
         '/message_page': (context) => MessagePage(),
         '/others_message_page': (context) => OthersMessagePage(),
         '/session_view_page': (context) => SessionViewPage(),
+        '/add_session_page' : (context) => AddSessionPage(),
       },
     ),
   );
