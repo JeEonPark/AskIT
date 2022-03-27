@@ -1,19 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart' as intl;
 
 import 'main.dart';
 
 FocusNode titleFocus = FocusNode();
 FocusNode sessionFocus = FocusNode();
-FocusNode periodFocus = FocusNode();
 
 final titleInputController = TextEditingController();
 final textsInputController = TextEditingController();
-final periodInputController = TextEditingController();
 
 int currentIndex = 0;
+
+DateTime? dateTime_due_date;
+String time = "?";
 
 final PageController controller = PageController(initialPage: 0, viewportFraction: 1);
 
@@ -37,7 +40,7 @@ Future<String> getUsernameByUid() async {
   return answer;
 }
 
-void writeSessionDocument(String title, String texts) async {
+void writeSessionDocument(String title, String texts, Timestamp due_date) async {
   await FirebaseFirestore.instance
       .collection('DiscussPage_Sessions')
       .doc()
@@ -47,6 +50,10 @@ void writeSessionDocument(String title, String texts) async {
         'texts': texts,
         'date': Timestamp.now(),
         'uid': FirebaseAuth.instance.currentUser?.uid,
+        'due_date': due_date,
+        'liked': [],
+        'joined': [FirebaseAuth.instance.currentUser?.uid],
+        'chatroom_joined': [FirebaseAuth.instance.currentUser?.uid],
       })
       .then((value) => print("Session Added"))
       .catchError((error) => print("Failed to add user: $error"));
@@ -69,7 +76,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
 
   @override
   Widget build(BuildContext context) {
-    periodInputController.text = "30";
     return GestureDetector(
       onTap: () {
         titleFocus.unfocus();
@@ -95,6 +101,8 @@ class _AddSessionPageState extends State<AddSessionPage> {
                             currentIndex = 0;
                             titleInputController.clear();
                             textsInputController.clear();
+                            dateTime_due_date = null;
+                            time = "?";
                           },
                           icon: Icon(Icons.arrow_back_rounded),
                           color: Colors.white,
@@ -115,15 +123,13 @@ class _AddSessionPageState extends State<AddSessionPage> {
                   Expanded(
                     child: PageView.builder(
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: 3,
+                      itemCount: 2,
                       controller: controller,
                       itemBuilder: (context, i) {
                         if (i == 0) {
                           return addSessionFirstPage();
                         } else if (i == 1) {
                           return addSessionSecondPage();
-                        } else if (i == 2) {
-                          return addSessionThirdPage();
                         }
                         return Text("Loading");
                       },
@@ -150,7 +156,7 @@ class _AddSessionPageState extends State<AddSessionPage> {
                           iconSize: 30,
                           onPressed: () {
                             print(controller.page);
-                            if (currentIndex == 1 || currentIndex == 2) {
+                            if (currentIndex == 1) {
                               controller.previousPage(
                                 duration: Duration(milliseconds: 200),
                                 curve: Curves.easeOut,
@@ -160,7 +166,7 @@ class _AddSessionPageState extends State<AddSessionPage> {
                           icon: Icon(
                             currentIndex == 0
                                 ? Icons.photo_camera_outlined
-                                : currentIndex == 1 || currentIndex == 2
+                                : currentIndex == 1
                                     ? Icons.arrow_back_ios_new_rounded
                                     : null,
                             color: Colors.white,
@@ -170,7 +176,7 @@ class _AddSessionPageState extends State<AddSessionPage> {
                         Row(
                           children: [
                             Text(
-                              currentIndex == 2 ? "Post" : "",
+                              currentIndex == 1 ? "Post" : "",
                               style: const TextStyle(
                                 fontFamily: "Montserrat",
                                 fontSize: 18,
@@ -183,23 +189,47 @@ class _AddSessionPageState extends State<AddSessionPage> {
                               splashRadius: 25,
                               iconSize: 30,
                               onPressed: () {
-                                if (currentIndex == 2) {
-                                  writeSessionDocument(titleInputController.text, textsInputController.text);
+                                if (currentIndex == 1) {
+                                  DateTime date_final =
+                                      dateTime_due_date!.add(Duration(hours: 23, minutes: 59, seconds: 59));
+                                  Timestamp timestamp_due_date = Timestamp.fromDate(date_final);
+                                  writeSessionDocument(
+                                      titleInputController.text, textsInputController.text, timestamp_due_date);
                                   Navigator.pop(context);
                                   currentIndex = 0;
                                   titleInputController.clear();
                                   textsInputController.clear();
+                                  dateTime_due_date = null;
+                                  time = "?";
                                 } else {
-                                  controller.nextPage(
-                                    duration: Duration(milliseconds: 200),
-                                    curve: Curves.easeOut,
-                                  );
-                                  titleFocus.unfocus();
-                                  sessionFocus.unfocus();
+                                  if (dateTime_due_date != null) {
+                                    controller.nextPage(
+                                      duration: Duration(milliseconds: 200),
+                                      curve: Curves.easeOut,
+                                    );
+                                    titleFocus.unfocus();
+                                    sessionFocus.unfocus();
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          content: Text("You miss the set date!"),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text("Close"))
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
                                 }
                               },
                               icon: Icon(
-                                currentIndex == 2 ? Icons.check_outlined : Icons.arrow_forward_ios_rounded,
+                                currentIndex == 1 ? Icons.check_outlined : Icons.arrow_forward_ios_rounded,
                                 color: Colors.white,
                               ),
                             ),
@@ -219,257 +249,116 @@ class _AddSessionPageState extends State<AddSessionPage> {
       ),
     );
   }
-}
 
-Widget addSessionFirstPage() {
-  return SingleChildScrollView(
-    child: Column(
-      children: [
-        //title 텍스트 박스-------------------------
-        FractionallySizedBox(
-          widthFactor: 0.9,
-          child: SizedBox(
-            height: 45,
+  Widget addSessionFirstPage() {
+    int _currentValue = 3;
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          //title 텍스트 박스-------------------------
+          FractionallySizedBox(
+            widthFactor: 0.9,
+            child: SizedBox(
+              height: 45,
+              child: TextFormField(
+                controller: titleInputController,
+                focusNode: titleFocus,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                  fontFamily: "Montserrat",
+                ),
+                decoration: const InputDecoration(
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                  ),
+                  prefixIcon: SizedBox(
+                    child: Center(
+                      widthFactor: 0.0,
+                      child: Text(
+                        'Title : ',
+                        style: TextStyle(
+                          color: Color.fromARGB(128, 255, 255, 255),
+                          fontFamily: "Montserrat",
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                textInputAction: TextInputAction.next,
+              ),
+            ),
+          ),
+          SizedBox(height: 5),
+          // date picker period 박스 -------------------------------------------------------
+          Row(
+            children: [
+              SizedBox(
+                width: MediaQuery.of((navigatorKey.currentState?.context as BuildContext)).size.width * 0.05,
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    final now = DateTime.now();
+                    final afterMonth = now.add(Duration(days: 30));
+                    dateTime_due_date = (await showDatePicker(
+                      context: navigatorKey.currentState?.context as BuildContext,
+                      initialDate: now,
+                      firstDate: DateTime(now.year, now.month, now.day),
+                      lastDate: DateTime(afterMonth.year, afterMonth.month, afterMonth.day),
+                    ))!;
+                    time = intl.DateFormat('yyyy.MM.dd').format(dateTime_due_date as DateTime);
+                    setState(() {});
+                  },
+                  child: Text("set date"),
+                  style: ElevatedButton.styleFrom(primary: Color.fromARGB(255, 72, 63, 178))),
+              SizedBox(width: 10),
+              // due date
+              Text(
+                "~ " + time,
+                style: TextStyle(
+                  color: Color.fromARGB(128, 255, 255, 255),
+                  fontFamily: "Montserrat",
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+
+          //Session 텍스트 박스-------------------------
+          FractionallySizedBox(
+            widthFactor: 0.9,
             child: TextFormField(
-              controller: titleInputController,
-              focusNode: titleFocus,
+              focusNode: sessionFocus,
+              controller: textsInputController,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.white,
                 fontFamily: "Montserrat",
               ),
               decoration: const InputDecoration(
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                border: InputBorder.none,
+                hintMaxLines: 4,
+                hintText:
+                    "Please write introduction about your session.\nYou can freely add chatting rules, live schedules, etc.",
+                hintStyle: TextStyle(
+                  color: Color.fromARGB(140, 255, 255, 255),
+                  fontFamily: "Montserrat",
                 ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
-                ),
-                prefixIcon: SizedBox(
-                  child: Center(
-                    widthFactor: 0.0,
-                    child: Text(
-                      'Title : ',
-                      style: TextStyle(
-                        color: Color.fromARGB(128, 255, 255, 255),
-                        fontFamily: "Montserrat",
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              textInputAction: TextInputAction.next,
-            ),
-          ),
-        ),
-        SizedBox(height: 5),
-        // Session Period 텍스트 박스--------------
-        FractionallySizedBox(
-          // width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width * 0.9,
-          widthFactor: 0.9,
-          child: Row(
-            children: [
-              SizedBox(
-                height: 45,
-                width: 85,
-                child: TextFormField(
-                  inputFormatters: [LengthLimitingTextInputFormatter(2)],
-                  controller: periodInputController,
-                  focusNode: periodFocus,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Montserrat",
-                  ),
-                  decoration: const InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide.none,
-                    ),
-                    prefixIcon: SizedBox(
-                      width: 60,
-                      child: Center(
-                        widthFactor: 0.0,
-                        child: Text(
-                          'Period : ',
-                          style: TextStyle(
-                            color: Color.fromARGB(128, 255, 255, 255),
-                            fontFamily: "Montserrat",
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  textInputAction: TextInputAction.next,
-                ),
-              ),
-              SizedBox(
-                child: Text(
-                  'days',
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 255, 255, 255),
-                    fontFamily: "Montserrat",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-        //Session 텍스트 박스-------------------------
-        FractionallySizedBox(
-          widthFactor: 0.9,
-          child: TextFormField(
-            focusNode: sessionFocus,
-            controller: textsInputController,
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-              fontFamily: "Montserrat",
-            ),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              hintMaxLines: 4,
-              hintText:
-                  "Please write introduction about your session.\nYou can freely add chatting rules, live schedules, etc.",
-              hintStyle: TextStyle(
-                color: Color.fromARGB(140, 255, 255, 255),
-                fontFamily: "Montserrat",
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-Widget addSessionSecondPage() {
-  return (Text("Select Categories"));
-}
-
-Widget addSessionThirdPage() {
-  return (Column(
-    children: [
-      Text(
-        "Answer Method",
-        style: TextStyle(
-          fontSize: 18,
-          fontFamily: "Montserrat",
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      SizedBox(height: 5),
-      Container(
-        color: Colors.white,
-        height: 1,
-        width: 165,
-      ),
-      SizedBox(height: 30),
-      //Text Chat 버튼
-      SizedBox(
-        height: 50,
-        width: 280,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: const Color.fromARGB(255, 127, 116, 255),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-          ),
-          onPressed: () {},
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.question_answer_outlined,
-                size: 22,
-              ),
-              SizedBox(width: 10),
-              Text(
-                "Text Chat",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      //Voice Call 버튼
-      SizedBox(height: 10),
-      SizedBox(
-        height: 50,
-        width: 280,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: const Color.fromARGB(255, 127, 116, 255),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-          ),
-          onPressed: () {},
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.phone_outlined,
-                size: 24,
-              ),
-              SizedBox(width: 10),
-              Text(
-                "Text & Voice Call",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      //Video Call 버튼
-      SizedBox(height: 10),
-      SizedBox(
-        height: 50,
-        width: 280,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: const Color.fromARGB(255, 127, 116, 255),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-          ),
-          onPressed: () {},
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.videocam_outlined,
-                size: 24,
-              ),
-              SizedBox(width: 10),
-              Text(
-                "Text & Video Call",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ],
-  ));
+  Widget addSessionSecondPage() {
+    return (Text("Select Categories"));
+  }
 }
