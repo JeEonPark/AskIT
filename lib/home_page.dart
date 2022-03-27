@@ -91,22 +91,19 @@ Future<List> discussGetDocumnetList() async {
   List<String> lists = [];
   if (discussPageSelected == 1) {
     //Explore 페이지
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection("DiscussPage_Sessions")
-        .orderBy('date', descending: true)
-        .get();
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection("DiscussPage_Sessions").orderBy('date', descending: true).get();
     snapshot.docs.forEach((element) {
       lists.add(element.id);
     });
 
-    snapshot.docs.forEach((element) { //due_date를 지났으면 제외
+    snapshot.docs.forEach((element) {
+      //due_date를 지났으면 제외
       DateTime due_date = element.get('due_date').toDate();
-      if(due_date.isBefore(DateTime.now())){
+      if (due_date.isBefore(DateTime.now())) {
         lists.remove(element.id);
       }
     });
-
-
   } else if (discussPageSelected == 2) {
     //Joined 페이지
     QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -119,22 +116,20 @@ Future<List> discussGetDocumnetList() async {
     });
   } else if (discussPageSelected == 3) {
     //Ended 페이지
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection("DiscussPage_Sessions")
-        .orderBy('date', descending: true)
-        .get();
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection("DiscussPage_Sessions").orderBy('date', descending: true).get();
 
     snapshot.docs.forEach((element) {
       lists.add(element.id);
     });
 
-    snapshot.docs.forEach((element) { //due_date를 지나지 않았으면(세션 진행중이면) 제외
+    snapshot.docs.forEach((element) {
+      //due_date를 지나지 않았으면(세션 진행중이면) 제외
       DateTime due_date = element.get('due_date').toDate();
-      if(due_date.isAfter(DateTime.now())){
+      if (due_date.isAfter(DateTime.now())) {
         lists.remove(element.id);
       }
     });
-
   }
 
   return lists;
@@ -217,11 +212,11 @@ class _HomePageState extends State<HomePage> {
               currentIndex: _currentIndex,
               items: const [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.question_answer_outlined),
+                  icon: Icon(Icons.live_help_outlined),
                   label: ('Ask'),
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite),
+                  icon: Icon(Icons.question_answer_outlined),
                   label: ('Discuss'),
                 ),
                 BottomNavigationBarItem(

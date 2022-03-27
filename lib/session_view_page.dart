@@ -7,6 +7,8 @@ import 'package:intl/intl.dart' as intl;
 
 import 'main.dart';
 
+bool liveJoined = false;
+
 class SessionViewPage extends StatefulWidget {
   SessionViewPage({Key? key}) : super(key: key);
 
@@ -59,7 +61,7 @@ Future<Map> getChatroomUidUsername(String docId) async {
   Map maps = {};
   //질문 올린 사람 uid 닉네임 매치
   DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(docId).get();
-  List joinedList = snapshot.get('joined');
+  List joinedList = snapshot.get('chatroom_joined');
 
   for (var element in joinedList) {
     maps[element] = await getUsernamebyUid(element.toString());
@@ -95,22 +97,39 @@ Future<Map> getDocument(String docId) async {
   return map;
 }
 
+// chatroom joined에 내 uid 없으면 넣기 (joined와는 상관없이 첫 채팅을 칠 시 작동)
+Future editChatroomJoinedListArray(String docId) async {
+//user uid 얻기
+  String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  //이 세션의 chatroom joined 리스트 얻기
+  DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(docId).get();
+
+  List joinedList = snapshot.get('chatroom_joined');
+  bool joined = joinedList.contains(FirebaseAuth.instance.currentUser?.uid);
+
+  //내 이름이 리스트에 없을 때만 넣기
+  if (!joined) {
+    await FirebaseFirestore.instance
+        .collection('DiscussPage_Sessions')
+        .doc(docId)
+        .update({
+          'chatroom_joined': FieldValue.arrayUnion([uid]),
+        })
+        .then((value) => print("add in joined list"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
+}
+
 // joined에 내 uid 넣거나 빼기
 Future editJoinedArray(String docId) async {
   //user uid 얻기
-  QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection("UserInformation")
-      .where(
-        'uid',
-        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
-      )
-      .get();
-  String uid = snapshot.docs.first.get("uid");
+  String uid = FirebaseAuth.instance.currentUser!.uid;
 
   //이 세션의 joined 리스트 얻기
-  DocumentSnapshot snapshot2 = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(docId).get();
+  DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("DiscussPage_Sessions").doc(docId).get();
 
-  List joinedList = snapshot2.get('joined');
+  List joinedList = snapshot.get('joined');
   bool joined = joinedList.contains(FirebaseAuth.instance.currentUser?.uid);
 
   if (joined) {
@@ -240,6 +259,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                       IconButton(
                         padding: EdgeInsets.all(20),
                         onPressed: () {
+                          liveJoined = false;
                           Navigator.pop(context);
                         },
                         iconSize: 35,
@@ -428,41 +448,43 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                             flex: 1,
                                           ),
                                           //Contents 버튼
-                                          Column(
-                                            children: [
-                                              TextButton(
-                                                style: TextButton.styleFrom(
-                                                  padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
-                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                  splashFactory: NoSplash.splashFactory,
-                                                  primary: pageSelected == 1
-                                                      ? Colors.white
-                                                      : Color.fromARGB(100, 255, 255, 255),
-                                                  textStyle: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontFamily: 'Montserrat',
+                                          Container(
+                                            child: Column(
+                                              children: [
+                                                TextButton(
+                                                  style: TextButton.styleFrom(
+                                                    padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                    splashFactory: NoSplash.splashFactory,
+                                                    primary: pageSelected == 1
+                                                        ? Colors.white
+                                                        : Color.fromARGB(100, 255, 255, 255),
+                                                    textStyle: const TextStyle(
+                                                      fontSize: 15,
+                                                      fontFamily: 'Montserrat',
+                                                    ),
                                                   ),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      pageSelected = 1;
+                                                    });
+                                                  },
+                                                  child: const Text("Contents"),
                                                 ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    pageSelected = 1;
-                                                  });
-                                                },
-                                                child: const Text("Contents"),
-                                              ),
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color: pageSelected == 1
-                                                      ? Colors.white
-                                                      : const Color.fromARGB(0, 255, 255, 255),
-                                                  borderRadius: const BorderRadius.all(Radius.circular(100)),
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color: pageSelected == 1
+                                                        ? Colors.white
+                                                        : const Color.fromARGB(0, 255, 255, 255),
+                                                    borderRadius: const BorderRadius.all(Radius.circular(100)),
+                                                  ),
+                                                  margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                                  padding: const EdgeInsets.all(0),
+                                                  width: 40,
+                                                  height: 1,
                                                 ),
-                                                margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
-                                                padding: const EdgeInsets.all(0),
-                                                width: 40,
-                                                height: 1,
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                           const Spacer(
                                             flex: 2,
@@ -586,8 +608,8 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                               children: [
                                                 StreamBuilder(
                                                     stream: chattingStream(args["docId"]),
-                                                    builder: (context, AsyncSnapshot snapshot) {
-                                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                                    builder: (context, AsyncSnapshot streamSnapshot) {
+                                                      if (streamSnapshot.connectionState == ConnectionState.waiting) {
                                                         return Container(
                                                           height: 100,
                                                           alignment: Alignment.center,
@@ -600,7 +622,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                           ),
                                                         );
                                                       } else {
-                                                        List snapshotList = snapshot.data.docs;
+                                                        List snapshotList = streamSnapshot.data.docs;
                                                         return FutureBuilder<Object>(
                                                             future: getChatroomUidUsername(args["docId"]),
                                                             builder: (context, AsyncSnapshot futureSnapshot) {
@@ -640,16 +662,187 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                     if (pageSelected == 3)
                                       //Live 화면
                                       Expanded(
-                                        child: Center(
-                                          child: Text(
-                                            "Live",
-                                            style: TextStyle(
-                                              height: 1.8,
-                                              color: Color.fromARGB(255, 255, 255, 255),
-                                              fontSize: 15,
-                                              fontFamily: 'Montserrat',
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              flex: 5,
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          //사람 아이콘
+                                                          personIcon("JeEon Park"),
+                                                          SizedBox(width: 40),
+                                                          //사람 아이콘
+                                                          personIcon("Nan Park"),
+                                                          SizedBox(width: 40),
+                                                          //사람 아이콘
+                                                          personIcon("Tom"),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: 15),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          //사람 아이콘
+                                                          personIcon("Harry"),
+                                                          SizedBox(width: 40),
+                                                          //사람 아이콘
+                                                          personIcon("Hermione"),
+                                                          SizedBox(width: 40),
+                                                          //사람 아이콘
+                                                          personIcon("Ronald"),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: 15),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          //사람 아이콘
+                                                          personIcon("Severus"),
+                                                          SizedBox(width: 40),
+                                                          //사람 아이콘
+                                                          personIcon("Albus"),
+                                                          SizedBox(width: 40),
+                                                          //사람 아이콘
+                                                          personIcon("Cedric"),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                            Expanded(
+                                              flex: 3,
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Icon(Icons.people_outline_outlined, color: Colors.white),
+                                                        Text(
+                                                          "16",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(height: 25),
+                                                    if (liveJoined)
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Column(
+                                                            children: [
+                                                              Container(
+                                                                width: 60,
+                                                                height: 60,
+                                                                decoration: BoxDecoration(
+                                                                  border: Border.all(
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                  borderRadius: BorderRadius.circular(100),
+                                                                ),
+                                                                child: Icon(
+                                                                  Icons.mic_off_outlined,
+                                                                  color: Colors.white,
+                                                                  size: 38,
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 7),
+                                                              Text(
+                                                                "mute",
+                                                                style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors.white,
+                                                                  fontFamily: "Montserrat",
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(width: 45),
+                                                          Column(
+                                                            children: [
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  setState(() {
+                                                                    liveJoined = false;
+                                                                  });
+                                                                },
+                                                                child: Container(
+                                                                  width: 60,
+                                                                  height: 60,
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors.red,
+                                                                    border: Border.all(
+                                                                      color: Colors.red,
+                                                                    ),
+                                                                    borderRadius: BorderRadius.circular(100),
+                                                                  ),
+                                                                  child: Icon(
+                                                                    Icons.call_end_outlined,
+                                                                    color: Colors.white,
+                                                                    size: 38,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 7),
+                                                              Text(
+                                                                "leave",
+                                                                style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors.white,
+                                                                  fontFamily: "Montserrat",
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      )
+                                                    else
+                                                      Column(
+                                                        children: [
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                liveJoined = true;
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              alignment: Alignment.center,
+                                                              width: 160,
+                                                              height: 50,
+                                                              decoration: BoxDecoration(
+                                                                color: Color.fromARGB(255, 63, 178, 109),
+                                                                borderRadius: BorderRadius.circular(100),
+                                                              ),
+                                                              child: Text(
+                                                                "Join Live",
+                                                                style: TextStyle(
+                                                                  fontSize: 18,
+                                                                  color: Colors.white,
+                                                                  fontFamily: "Montserrat",
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                   ],
@@ -664,7 +857,10 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                     //가로줄 Container
                                     Container(height: 1, width: MediaQuery.of(context).size.width, color: Colors.white),
                                     Expanded(
-                                      child: pageSelected == 2
+                                      child: pageSelected == 2 &&
+                                              snapshot.data.values
+                                                  .elementAt(0)['joined']
+                                                  .contains(FirebaseAuth.instance.currentUser?.uid)
                                           ? Container(
                                               height: 60,
                                               //하단바
@@ -718,8 +914,10 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                         splashRadius: 25,
                                                         iconSize: 30,
                                                         onPressed: () {
-                                                          writeChatting(args['docId'], textController.text);
-                                                          textController.clear();
+                                                          if (textController.text.isNotEmpty) {
+                                                            writeChatting(args['docId'], textController.text);
+                                                            textController.clear();
+                                                          }
                                                         },
                                                         icon: Icon(
                                                           Icons.send_outlined,
@@ -784,8 +982,12 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                   width: 280,
                                                   child: ElevatedButton.icon(
                                                     onPressed: () async {
-                                                      await editJoinedArray(args['docId']);
-                                                      setState(() {});
+                                                      if (snapshot.data.values.elementAt(0)['uid'] !=
+                                                          FirebaseAuth.instance.currentUser?.uid) {
+                                                        await editJoinedArray(args['docId']);
+                                                        await editChatroomJoinedListArray(args['docId']);
+                                                        setState(() {});
+                                                      }
                                                     },
                                                     style: ElevatedButton.styleFrom(
                                                       shape: RoundedRectangleBorder(
@@ -908,5 +1110,35 @@ Widget message(String username, String texts) {
         ),
       ],
     ),
+  );
+}
+
+Widget personIcon(String name) {
+  return Column(
+    children: [
+      Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Icon(
+          Icons.person_outline_outlined,
+          color: Colors.black,
+          size: 38,
+        ),
+      ),
+      SizedBox(height: 7),
+      Text(
+        name,
+        style: TextStyle(
+          fontSize: 10,
+          color: Colors.white,
+          fontFamily: "Montserrat",
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ],
   );
 }
