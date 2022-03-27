@@ -36,6 +36,12 @@ Future<String> getScratch(String docId) async {
       .doc(FirebaseAuth.instance.currentUser?.uid)
       .get();
 
+  if (!snapshot.exists) {
+    writeScratch(docId, "");
+
+    return "";
+  }
+
   return snapshot.get("texts");
 }
 
