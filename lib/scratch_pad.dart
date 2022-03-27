@@ -12,6 +12,7 @@ class ScratchPad extends StatefulWidget {
   State<ScratchPad> createState() => _ScratchPadState();
 }
 
+//
 //내 메모 입력
 void writeScratch(String docId, String texts) async {
   await FirebaseFirestore.instance
