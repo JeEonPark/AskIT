@@ -1,3 +1,4 @@
+import 'package:ask_it/session_view_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,10 @@ Future<String> getScratch(String docId) async {
   return snapshot.get("texts");
 }
 
+bool update = false;
+
 class _ScratchPadState extends State<ScratchPad> {
+  @override
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -57,7 +61,7 @@ class _ScratchPadState extends State<ScratchPad> {
                     IconButton(
                       padding: EdgeInsets.all(20),
                       onPressed: () async {
-                        writeScratch(args["docId"], "asdf");
+                        writeScratch(args["docId"], textsInputController.text);
                         Navigator.pop(context);
                       },
                       iconSize: 35,
@@ -94,6 +98,10 @@ class _ScratchPadState extends State<ScratchPad> {
                           ),
                         );
                       } else {
+                        if (update == false) {
+                          textsInputController.text = snapshot.data;
+                          update = true;
+                        }
                         return SizedBox(
                           width: MediaQuery.of(context).size.width * 0.9,
                           child: TextFormField(
