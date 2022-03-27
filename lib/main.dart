@@ -32,6 +32,7 @@ import 'others_message_page.dart';
 import 'add_session_page.dart';
 import 'others_page_search_page.dart';
 import 'scratch_pad.dart';
+import 'participants_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -61,6 +62,7 @@ void main() async {
         '/add_session_page': (context) => AddSessionPage(),
         '/others_page_search_page': (context) => OthersPageSearchPage(),
         '/scratch_pad': (context) => ScratchPad(),
+        '/participants_page': (context) => ParticipantsPage(),
       },
     ),
   );

@@ -40,6 +40,7 @@ void writeQuestionDocument(String title, String texts) async {
         'texts': texts,
         'date': Timestamp.now(),
         'uid': FirebaseAuth.instance.currentUser?.uid,
+        'liked': [],
       })
       .then((value) => print("Question Added"))
       .catchError((error) => print("Failed to add user: $error"));
