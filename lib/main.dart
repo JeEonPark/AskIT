@@ -5,6 +5,7 @@ import 'package:ask_it/message_page.dart';
 import 'package:ask_it/others_message_page.dart';
 import 'package:ask_it/others_page_search_page.dart';
 import 'package:ask_it/question_view_page.dart';
+import 'package:ask_it/scratch_pad.dart';
 import 'package:ask_it/sign_up_page.dart';
 import 'package:ask_it/add_question_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,6 +17,7 @@ import 'package:ask_it/search_page.dart';
 import 'package:ask_it/ask_answer_method_page.dart';
 import 'package:ask_it/message_page.dart';
 import 'package:ask_it/others_page_search_page.dart';
+import 'package:ask_it/scratch_pad.dart';
 
 import 'home_page.dart';
 import 'login_page.dart';
@@ -29,6 +31,7 @@ import 'session_view_page.dart';
 import 'others_message_page.dart';
 import 'add_session_page.dart';
 import 'others_page_search_page.dart';
+import 'scratch_pad.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -57,6 +60,7 @@ void main() async {
         '/session_view_page': (context) => SessionViewPage(),
         '/add_session_page': (context) => AddSessionPage(),
         '/others_page_search_page': (context) => OthersPageSearchPage(),
+        '/scratch_pad': (context) => ScratchPad(),
       },
     ),
   );

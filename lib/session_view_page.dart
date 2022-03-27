@@ -272,7 +272,9 @@ class _SessionViewPageState extends State<SessionViewPage> {
                       //scratch pad 버튼
                       IconButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pushNamed(context, '/scratch_pad', arguments: {
+                            "docId": args["docId"],
+                          });
                         },
                         iconSize: 35,
                         icon: const Icon(
