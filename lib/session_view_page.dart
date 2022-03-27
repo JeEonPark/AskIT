@@ -97,6 +97,28 @@ Future<Map> getDocument(String docId) async {
   return map;
 }
 
+//scratch pad 내 document 넣기
+Future writeScratch(String docId) async {
+  DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+      .collection('DiscussPage_Sessions')
+      .doc(docId)
+      .collection('ScratchPad')
+      .doc(FirebaseAuth.instance.currentUser?.uid)
+      .get();
+  if (!snapshot.exists) {
+    await FirebaseFirestore.instance
+        .collection('DiscussPage_Sessions')
+        .doc(docId)
+        .collection('ScratchPad')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .set({
+          'texts': "",
+        })
+        .then((value) => print("Set"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
+}
+
 // chatroom joined에 내 uid 없으면 넣기 (joined와는 상관없이 첫 채팅을 칠 시 작동)
 Future editChatroomJoinedListArray(String docId) async {
 //user uid 얻기
@@ -988,6 +1010,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                           FirebaseAuth.instance.currentUser?.uid) {
                                                         await editJoinedArray(args['docId']);
                                                         await editChatroomJoinedListArray(args['docId']);
+                                                        await writeScratch(args['docId']);
                                                         setState(() {});
                                                       }
                                                     },

@@ -14,7 +14,7 @@ class ScratchPad extends StatefulWidget {
 
 //
 //내 메모 입력
-void writeScratch(String docId, String texts) async {
+Future writeScratch(String docId, String texts) async {
   await FirebaseFirestore.instance
       .collection('DiscussPage_Sessions')
       .doc(docId)
@@ -39,10 +39,8 @@ Future<String> getScratch(String docId) async {
   return snapshot.get("texts");
 }
 
-bool update = false;
-
 class _ScratchPadState extends State<ScratchPad> {
-  @override
+  bool update = false;
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -62,8 +60,9 @@ class _ScratchPadState extends State<ScratchPad> {
                     IconButton(
                       padding: EdgeInsets.all(20),
                       onPressed: () async {
-                        writeScratch(args["docId"], textsInputController.text);
+                        await writeScratch(args["docId"], textsInputController.text);
                         Navigator.pop(context);
+                        textsInputController.clear();
                       },
                       iconSize: 35,
                       icon: const Icon(
@@ -99,6 +98,7 @@ class _ScratchPadState extends State<ScratchPad> {
                           ),
                         );
                       } else {
+                        print(update);
                         if (update == false) {
                           textsInputController.text = snapshot.data;
                           update = true;
