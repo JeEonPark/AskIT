@@ -1,10 +1,21 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ask_it/main.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'main.dart';
+
+FocusNode titleFocus = FocusNode();
+FocusNode sessionFocus = FocusNode();
+FocusNode periodFocus = FocusNode();
+
+final titleInputController = TextEditingController();
+final textsInputController = TextEditingController();
+final periodInputController = TextEditingController();
+
+int currentIndex = 0;
+
+final PageController controller = PageController(initialPage: 0, viewportFraction: 1);
 
 class AddSessionPage extends StatefulWidget {
   AddSessionPage({Key? key}) : super(key: key);
@@ -13,9 +24,450 @@ class AddSessionPage extends StatefulWidget {
   State<AddSessionPage> createState() => _AddSessionPageState();
 }
 
+Future<String> getUsernameByUid() async {
+  String answer = "";
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection("UserInformation")
+      .where(
+        'uid',
+        isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+      )
+      .get();
+  answer = snapshot.docs.first.get("username");
+  return answer;
+}
+
+void writeSessionDocument(String title, String texts) async {
+  await FirebaseFirestore.instance
+      .collection('DiscussPage_Sessions')
+      .doc()
+      .set({
+        'author': await getUsernameByUid(),
+        'title': title,
+        'texts': texts,
+        'date': Timestamp.now(),
+        'uid': FirebaseAuth.instance.currentUser?.uid,
+      })
+      .then((value) => print("Session Added"))
+      .catchError((error) => print("Failed to add user: $error"));
+}
+
 class _AddSessionPageState extends State<AddSessionPage> {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(home: SafeArea(child: Scaffold(body: Center(child: Text("Add session page")))));
+  void initState() {
+    super.initState();
+
+    /// Attach a listener which will update the state and refresh the page index
+    controller.addListener(() {
+      if (controller.page?.round() != currentIndex && this.mounted) {
+        setState(() {
+          currentIndex = controller.page?.round() as int;
+        });
+      }
+    });
   }
+
+  @override
+  Widget build(BuildContext context) {
+    periodInputController.text = "30";
+    return GestureDetector(
+      onTap: () {
+        titleFocus.unfocus();
+        sessionFocus.unfocus();
+      },
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: const Color.fromARGB(255, 29, 30, 37),
+          body: SafeArea(
+            child: Container(
+              child: Column(
+                children: [
+                  // 화살표, Add Session 상단바
+                  Container(
+                    height: 80,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.all(20),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            currentIndex = 0;
+                            titleInputController.clear();
+                            textsInputController.clear();
+                          },
+                          icon: Icon(Icons.arrow_back_rounded),
+                          color: Colors.white,
+                          iconSize: 35,
+                        ),
+                        const Text(
+                          "Add Session",
+                          style: TextStyle(
+                            fontFamily: "Montserrat",
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: PageView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: 3,
+                      controller: controller,
+                      itemBuilder: (context, i) {
+                        if (i == 0) {
+                          return addSessionFirstPage();
+                        } else if (i == 1) {
+                          return addSessionSecondPage();
+                        } else if (i == 2) {
+                          return addSessionThirdPage();
+                        }
+                        return Text("Loading");
+                      },
+                    ),
+                  ),
+                  Spacer(),
+                  Container(
+                    height: 60,
+                    //구분선
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Colors.white, width: 1),
+                      ),
+                    ),
+                    //하단바-------------------------------------------------
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 10,
+                        ),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          splashRadius: 25,
+                          iconSize: 30,
+                          onPressed: () {
+                            print(controller.page);
+                            if (currentIndex == 1 || currentIndex == 2) {
+                              controller.previousPage(
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.easeOut,
+                              );
+                            }
+                          },
+                          icon: Icon(
+                            currentIndex == 0
+                                ? Icons.photo_camera_outlined
+                                : currentIndex == 1 || currentIndex == 2
+                                    ? Icons.arrow_back_ios_new_rounded
+                                    : null,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Spacer(),
+                        Row(
+                          children: [
+                            Text(
+                              currentIndex == 2 ? "Post" : "",
+                              style: const TextStyle(
+                                fontFamily: "Montserrat",
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              splashRadius: 25,
+                              iconSize: 30,
+                              onPressed: () {
+                                if (currentIndex == 2) {
+                                  writeSessionDocument(titleInputController.text, textsInputController.text);
+                                  Navigator.pop(context);
+                                  currentIndex = 0;
+                                  titleInputController.clear();
+                                  textsInputController.clear();
+                                } else {
+                                  controller.nextPage(
+                                    duration: Duration(milliseconds: 200),
+                                    curve: Curves.easeOut,
+                                  );
+                                  titleFocus.unfocus();
+                                  sessionFocus.unfocus();
+                                }
+                              },
+                              icon: Icon(
+                                currentIndex == 2 ? Icons.check_outlined : Icons.arrow_forward_ios_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget addSessionFirstPage() {
+  return Column(
+    children: [
+      //title 텍스트 박스-------------------------
+      FractionallySizedBox(
+        widthFactor: 0.9,
+        child: SizedBox(
+          height: 45,
+          child: TextFormField(
+            controller: titleInputController,
+            focusNode: titleFocus,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.white,
+              fontFamily: "Montserrat",
+            ),
+            decoration: const InputDecoration(
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+              ),
+              prefixIcon: SizedBox(
+                child: Center(
+                  widthFactor: 0.0,
+                  child: Text(
+                    'Title : ',
+                    style: TextStyle(
+                      color: Color.fromARGB(128, 255, 255, 255),
+                      fontFamily: "Montserrat",
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            textInputAction: TextInputAction.next,
+          ),
+        ),
+      ),
+      SizedBox(height: 5),
+      // Session Period 텍스트 박스--------------
+      FractionallySizedBox(
+        // width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width * 0.9,
+        widthFactor: 0.9,
+        child: Row(
+          children: [
+            SizedBox(
+              height: 45,
+              width: 85,
+              child: TextFormField(
+                inputFormatters: [LengthLimitingTextInputFormatter(2)],
+                controller: periodInputController,
+                focusNode: periodFocus,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Montserrat",
+                ),
+                decoration: const InputDecoration(
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: SizedBox(
+                    width: 60,
+                    child: Center(
+                      widthFactor: 0.0,
+                      child: Text(
+                        'Period : ',
+                        style: TextStyle(
+                          color: Color.fromARGB(128, 255, 255, 255),
+                          fontFamily: "Montserrat",
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                textInputAction: TextInputAction.next,
+              ),
+            ),
+            SizedBox(
+              child: Text(
+                'days',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  fontFamily: "Montserrat",
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+      //Session 텍스트 박스-------------------------
+      FractionallySizedBox(
+        widthFactor: 0.9,
+        child: TextFormField(
+          focusNode: sessionFocus,
+          controller: textsInputController,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.white,
+            fontFamily: "Montserrat",
+          ),
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+            hintMaxLines: 4,
+            hintText:
+                "Please write introduction about your session.\nYou can freely add chatting rules, live schedules, etc.",
+            hintStyle: TextStyle(
+              color: Color.fromARGB(140, 255, 255, 255),
+              fontFamily: "Montserrat",
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget addSessionSecondPage() {
+  return (Text("Select Categories"));
+}
+
+Widget addSessionThirdPage() {
+  return (Column(
+    children: [
+      Text(
+        "Answer Method",
+        style: TextStyle(
+          fontSize: 18,
+          fontFamily: "Montserrat",
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      SizedBox(height: 5),
+      Container(
+        color: Colors.white,
+        height: 1,
+        width: 165,
+      ),
+      SizedBox(height: 30),
+      //Text Chat 버튼
+      SizedBox(
+        height: 50,
+        width: 280,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: const Color.fromARGB(255, 127, 116, 255),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          onPressed: () {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(
+                Icons.question_answer_outlined,
+                size: 22,
+              ),
+              SizedBox(width: 10),
+              Text(
+                "Text Chat",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Montserrat',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      //Voice Call 버튼
+      SizedBox(height: 10),
+      SizedBox(
+        height: 50,
+        width: 280,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: const Color.fromARGB(255, 127, 116, 255),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          onPressed: () {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(
+                Icons.phone_outlined,
+                size: 24,
+              ),
+              SizedBox(width: 10),
+              Text(
+                "Text & Voice Call",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Montserrat',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      //Video Call 버튼
+      SizedBox(height: 10),
+      SizedBox(
+        height: 50,
+        width: 280,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: const Color.fromARGB(255, 127, 116, 255),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          onPressed: () {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(
+                Icons.videocam_outlined,
+                size: 24,
+              ),
+              SizedBox(width: 10),
+              Text(
+                "Text & Video Call",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Montserrat',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  ));
 }
