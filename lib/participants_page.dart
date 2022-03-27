@@ -12,6 +12,7 @@ class ParticipantsPage extends StatefulWidget {
 class _ParticipantsPageState extends State<ParticipantsPage> {
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SafeArea(

@@ -91,19 +91,22 @@ Future<List> discussGetDocumnetList() async {
   List<String> lists = [];
   if (discussPageSelected == 1) {
     //Explore 페이지
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection("DiscussPage_Sessions").orderBy('date', descending: true).get();
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("DiscussPage_Sessions")
+        .orderBy('date', descending: true)
+        .get();
     snapshot.docs.forEach((element) {
       lists.add(element.id);
     });
 
-    snapshot.docs.forEach((element) {
-      //due_date를 지났으면 제외
+    snapshot.docs.forEach((element) { //due_date를 지났으면 제외
       DateTime due_date = element.get('due_date').toDate();
-      if (due_date.isBefore(DateTime.now())) {
+      if(due_date.isBefore(DateTime.now())){
         lists.remove(element.id);
       }
     });
+
+
   } else if (discussPageSelected == 2) {
     //Joined 페이지
     QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -116,20 +119,22 @@ Future<List> discussGetDocumnetList() async {
     });
   } else if (discussPageSelected == 3) {
     //Ended 페이지
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection("DiscussPage_Sessions").orderBy('date', descending: true).get();
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("DiscussPage_Sessions")
+        .orderBy('date', descending: true)
+        .get();
 
     snapshot.docs.forEach((element) {
       lists.add(element.id);
     });
 
-    snapshot.docs.forEach((element) {
-      //due_date를 지나지 않았으면(세션 진행중이면) 제외
+    snapshot.docs.forEach((element) { //due_date를 지나지 않았으면(세션 진행중이면) 제외
       DateTime due_date = element.get('due_date').toDate();
-      if (due_date.isAfter(DateTime.now())) {
+      if(due_date.isAfter(DateTime.now())){
         lists.remove(element.id);
       }
     });
+
   }
 
   return lists;
@@ -236,10 +241,10 @@ class _HomePageState extends State<HomePage> {
 
 //#region first, second 함수
 
-Widget first(String docId, String title, String texts, String author, DateTime date, String uid, List joined) {
+Widget first(String docId, String title, String texts, String author, DateTime date, String uid) {
   return GestureDetector(
     onTap: () async {
-      await gotoQuestionViewPage(docId, title, texts, author, date, uid, joined);
+      await gotoQuestionViewPage(docId, title, texts, author, date, uid);
       navigatorKey.currentState?.setState(() {});
     },
     child: Container(
@@ -343,10 +348,10 @@ Widget first(String docId, String title, String texts, String author, DateTime d
   );
 }
 
-Widget second(String docId, String title, String texts, String author, DateTime date, String uid, List joined) {
+Widget second(String docId, String title, String texts, String author, DateTime date, String uid) {
   return GestureDetector(
     onTap: () {
-      gotoQuestionViewPage(docId, title, texts, author, date, uid, joined);
+      gotoQuestionViewPage(docId, title, texts, author, date, uid);
       navigatorKey.currentState?.setState(() {});
     },
     child: Container(
@@ -459,7 +464,7 @@ Widget second(String docId, String title, String texts, String author, DateTime 
 //#endregion
 
 //#region gotoQuestionViewPage 함수
-Future gotoQuestionViewPage(String docId, String title, String texts, String author, DateTime date, String uid, List joined) async {
+Future gotoQuestionViewPage(String docId, String title, String texts, String author, DateTime date, String uid) async {
   if (_currentIndex == 0) {
     await navigatorKey.currentState?.pushNamed(
       '/question_view_page',
@@ -480,7 +485,6 @@ Future gotoQuestionViewPage(String docId, String title, String texts, String aut
       "author": author,
       "date": DateFormat('yyyy.MM.dd hh:mm').format(date),
       "uid": uid,
-      "joined": joined,
     });
   } else if (_currentIndex == 2) {
     await navigatorKey.currentState?.pushNamed(
@@ -712,7 +716,6 @@ class _AskState extends State<Ask> {
                                                   snapshot.data.values.elementAt(i)?['author'],
                                                   snapshot.data.values.elementAt(i)?['date'].toDate(),
                                                   snapshot.data.values.elementAt(i)?['uid'],
-                                                  snapshot.data.values.elementAt(i)?['joined'],
                                                 ),
                                                 if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                               ],
@@ -726,7 +729,6 @@ class _AskState extends State<Ask> {
                                                   snapshot.data.values.elementAt(i)?['author'],
                                                   snapshot.data.values.elementAt(i)?['date'].toDate(),
                                                   snapshot.data.values.elementAt(i)?['uid'],
-                                                  snapshot.data.values.elementAt(i)?['joined'],
                                                 ),
                                                 if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                               ],
@@ -1007,27 +1009,25 @@ class _DiscussState extends State<Discuss> {
                                               children: [
                                                 if (i == 0) SizedBox(height: 5),
                                                 first(
-                                                    snapshot.data.keys.elementAt(i),
-                                                    snapshot.data.values.elementAt(i)?['title'],
-                                                    snapshot.data.values.elementAt(i)?['texts'].replaceAll("\\n", " "),
-                                                    snapshot.data.values.elementAt(i)?['author'],
-                                                    snapshot.data.values.elementAt(i)?['date'].toDate(),
-                                                    snapshot.data.values.elementAt(i)?['uid'],
-                                                    snapshot.data.values.elementAt(i)?['joined']),
-                                                if (i == snapshot.data.length - 1) SizedBox(height: 5),
-                                              ],
-                                            )
-                                          : Column(
-                                              children: [
-                                                second(
                                                   snapshot.data.keys.elementAt(i),
                                                   snapshot.data.values.elementAt(i)?['title'],
                                                   snapshot.data.values.elementAt(i)?['texts'].replaceAll("\\n", " "),
                                                   snapshot.data.values.elementAt(i)?['author'],
                                                   snapshot.data.values.elementAt(i)?['date'].toDate(),
                                                   snapshot.data.values.elementAt(i)?['uid'],
-                                                  snapshot.data.values.elementAt(i)?['joined'],
                                                 ),
+                                                if (i == snapshot.data.length - 1) SizedBox(height: 5),
+                                              ],
+                                            )
+                                          : Column(
+                                              children: [
+                                                second(
+                                                    snapshot.data.keys.elementAt(i),
+                                                    snapshot.data.values.elementAt(i)?['title'],
+                                                    snapshot.data.values.elementAt(i)?['texts'].replaceAll("\\n", " "),
+                                                    snapshot.data.values.elementAt(i)?['author'],
+                                                    snapshot.data.values.elementAt(i)?['date'].toDate(),
+                                                    snapshot.data.values.elementAt(i)?['uid']),
                                                 if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                               ],
                                             ),
