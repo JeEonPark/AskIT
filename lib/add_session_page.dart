@@ -222,131 +222,133 @@ class _AddSessionPageState extends State<AddSessionPage> {
 }
 
 Widget addSessionFirstPage() {
-  return Column(
-    children: [
-      //title 텍스트 박스-------------------------
-      FractionallySizedBox(
-        widthFactor: 0.9,
-        child: SizedBox(
-          height: 45,
+  return SingleChildScrollView(
+    child: Column(
+      children: [
+        //title 텍스트 박스-------------------------
+        FractionallySizedBox(
+          widthFactor: 0.9,
+          child: SizedBox(
+            height: 45,
+            child: TextFormField(
+              controller: titleInputController,
+              focusNode: titleFocus,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                fontFamily: "Montserrat",
+              ),
+              decoration: const InputDecoration(
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                ),
+                prefixIcon: SizedBox(
+                  child: Center(
+                    widthFactor: 0.0,
+                    child: Text(
+                      'Title : ',
+                      style: TextStyle(
+                        color: Color.fromARGB(128, 255, 255, 255),
+                        fontFamily: "Montserrat",
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              textInputAction: TextInputAction.next,
+            ),
+          ),
+        ),
+        SizedBox(height: 5),
+        // Session Period 텍스트 박스--------------
+        FractionallySizedBox(
+          // width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width * 0.9,
+          widthFactor: 0.9,
+          child: Row(
+            children: [
+              SizedBox(
+                height: 45,
+                width: 85,
+                child: TextFormField(
+                  inputFormatters: [LengthLimitingTextInputFormatter(2)],
+                  controller: periodInputController,
+                  focusNode: periodFocus,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Montserrat",
+                  ),
+                  decoration: const InputDecoration(
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: SizedBox(
+                      width: 60,
+                      child: Center(
+                        widthFactor: 0.0,
+                        child: Text(
+                          'Period : ',
+                          style: TextStyle(
+                            color: Color.fromARGB(128, 255, 255, 255),
+                            fontFamily: "Montserrat",
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  textInputAction: TextInputAction.next,
+                ),
+              ),
+              SizedBox(
+                child: Text(
+                  'days',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 255, 255, 255),
+                    fontFamily: "Montserrat",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        //Session 텍스트 박스-------------------------
+        FractionallySizedBox(
+          widthFactor: 0.9,
           child: TextFormField(
-            controller: titleInputController,
-            focusNode: titleFocus,
+            focusNode: sessionFocus,
+            controller: textsInputController,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
             style: const TextStyle(
               fontSize: 14,
               color: Colors.white,
               fontFamily: "Montserrat",
             ),
             decoration: const InputDecoration(
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+              border: InputBorder.none,
+              hintMaxLines: 4,
+              hintText:
+                  "Please write introduction about your session.\nYou can freely add chatting rules, live schedules, etc.",
+              hintStyle: TextStyle(
+                color: Color.fromARGB(140, 255, 255, 255),
+                fontFamily: "Montserrat",
               ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
-              ),
-              prefixIcon: SizedBox(
-                child: Center(
-                  widthFactor: 0.0,
-                  child: Text(
-                    'Title : ',
-                    style: TextStyle(
-                      color: Color.fromARGB(128, 255, 255, 255),
-                      fontFamily: "Montserrat",
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            textInputAction: TextInputAction.next,
-          ),
-        ),
-      ),
-      SizedBox(height: 5),
-      // Session Period 텍스트 박스--------------
-      FractionallySizedBox(
-        // width: MediaQuery.of(navigatorKey.currentState?.context as BuildContext).size.width * 0.9,
-        widthFactor: 0.9,
-        child: Row(
-          children: [
-            SizedBox(
-              height: 45,
-              width: 85,
-              child: TextFormField(
-                inputFormatters: [LengthLimitingTextInputFormatter(2)],
-                controller: periodInputController,
-                focusNode: periodFocus,
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: "Montserrat",
-                ),
-                decoration: const InputDecoration(
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                  ),
-                  prefixIcon: SizedBox(
-                    width: 60,
-                    child: Center(
-                      widthFactor: 0.0,
-                      child: Text(
-                        'Period : ',
-                        style: TextStyle(
-                          color: Color.fromARGB(128, 255, 255, 255),
-                          fontFamily: "Montserrat",
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                textInputAction: TextInputAction.next,
-              ),
-            ),
-            SizedBox(
-              child: Text(
-                'days',
-                style: TextStyle(
-                  color: Color.fromARGB(255, 255, 255, 255),
-                  fontFamily: "Montserrat",
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-      //Session 텍스트 박스-------------------------
-      FractionallySizedBox(
-        widthFactor: 0.9,
-        child: TextFormField(
-          focusNode: sessionFocus,
-          controller: textsInputController,
-          keyboardType: TextInputType.multiline,
-          maxLines: null,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white,
-            fontFamily: "Montserrat",
-          ),
-          decoration: const InputDecoration(
-            border: InputBorder.none,
-            hintMaxLines: 4,
-            hintText:
-                "Please write introduction about your session.\nYou can freely add chatting rules, live schedules, etc.",
-            hintStyle: TextStyle(
-              color: Color.fromARGB(140, 255, 255, 255),
-              fontFamily: "Montserrat",
             ),
           ),
         ),
-      ),
-    ],
+      ],
+    ),
   );
 }
 

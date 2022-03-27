@@ -214,71 +214,73 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
 }
 
 Widget addQuestionFirstPage() {
-  return Column(
-    children: [
-      //title 텍스트 박스-------------------------
-      FractionallySizedBox(
-        widthFactor: 0.9,
-        child: SizedBox(
-          height: 45,
+  return SingleChildScrollView(
+    child: Column(
+      children: [
+        //title 텍스트 박스-------------------------
+        FractionallySizedBox(
+          widthFactor: 0.9,
+          child: SizedBox(
+            height: 45,
+            child: TextFormField(
+              controller: titleInputController,
+              focusNode: titleFocus,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                fontFamily: "Montserrat",
+              ),
+              decoration: const InputDecoration(
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+                ),
+                prefixIcon: SizedBox(
+                  child: Center(
+                    widthFactor: 0.0,
+                    child: Text(
+                      'Title : ',
+                      style: TextStyle(
+                        color: Color.fromARGB(128, 255, 255, 255),
+                        fontFamily: "Montserrat",
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              textInputAction: TextInputAction.next,
+            ),
+          ),
+        ),
+        SizedBox(height: 10),
+        //question 텍스트 박스-------------------------
+        FractionallySizedBox(
+          widthFactor: 0.9,
           child: TextFormField(
-            controller: titleInputController,
-            focusNode: titleFocus,
+            focusNode: questionFocus,
+            controller: textsInputController,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
             style: const TextStyle(
               fontSize: 14,
               color: Colors.white,
               fontFamily: "Montserrat",
             ),
             decoration: const InputDecoration(
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
+              border: InputBorder.none,
+              hintText: "Write your question here.",
+              hintStyle: TextStyle(
+                color: Color.fromARGB(140, 255, 255, 255),
+                fontFamily: "Montserrat",
               ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color.fromARGB(255, 127, 116, 255)),
-              ),
-              prefixIcon: SizedBox(
-                child: Center(
-                  widthFactor: 0.0,
-                  child: Text(
-                    'Title : ',
-                    style: TextStyle(
-                      color: Color.fromARGB(128, 255, 255, 255),
-                      fontFamily: "Montserrat",
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            textInputAction: TextInputAction.next,
-          ),
-        ),
-      ),
-      SizedBox(height: 10),
-      //question 텍스트 박스-------------------------
-      FractionallySizedBox(
-        widthFactor: 0.9,
-        child: TextFormField(
-          focusNode: questionFocus,
-          controller: textsInputController,
-          keyboardType: TextInputType.multiline,
-          maxLines: null,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white,
-            fontFamily: "Montserrat",
-          ),
-          decoration: const InputDecoration(
-            border: InputBorder.none,
-            hintText: "Write your question here.",
-            hintStyle: TextStyle(
-              color: Color.fromARGB(140, 255, 255, 255),
-              fontFamily: "Montserrat",
             ),
           ),
         ),
-      ),
-    ],
+      ],
+    ),
   );
 }
 
