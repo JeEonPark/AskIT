@@ -286,7 +286,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                       IconButton(
                         padding: EdgeInsets.fromLTRB(10, 0, 20, 0),
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pushNamed(context, '/participants_page', arguments: {'joined': args['joined']});
                         },
                         iconSize: 35,
                         icon: const Icon(

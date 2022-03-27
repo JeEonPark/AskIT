@@ -44,10 +44,10 @@ Future<Map> getDocument(String searchData) async {
 //#endregion Firebase 함수
 
 //#region First, Second 위젯
-Widget first(String docId, String title, String texts, String author, DateTime date, String uid) {
+Widget first(String docId, String title, String texts, String author, DateTime date, String uid, List joined) {
   return GestureDetector(
     onTap: () {
-      gotoQuestionViewPage(docId, title, texts, author, date, uid);
+      gotoQuestionViewPage(docId, title, texts, author, date, uid, joined);
     },
     child: Container(
       height: 150,
@@ -150,10 +150,10 @@ Widget first(String docId, String title, String texts, String author, DateTime d
   );
 }
 
-Widget second(String docId, String title, String texts, String author, DateTime date, String uid) {
+Widget second(String docId, String title, String texts, String author, DateTime date, String uid, List joined) {
   return GestureDetector(
     onTap: () {
-      gotoQuestionViewPage(docId, title, texts, author, date, uid);
+      gotoQuestionViewPage(docId, title, texts, author, date, uid, joined);
     },
     child: Container(
       height: 150,
@@ -377,6 +377,7 @@ class _SearchPageState extends State<SearchPage> {
                                                       snapshot.data.values.elementAt(i)?['author'],
                                                       snapshot.data.values.elementAt(i)?['date'].toDate(),
                                                       snapshot.data.values.elementAt(i)?['uid'],
+                                                      snapshot.data.values.elementAt(i)?['joined'],
                                                     ),
                                                     if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                                   ],
@@ -390,6 +391,7 @@ class _SearchPageState extends State<SearchPage> {
                                                       snapshot.data.values.elementAt(i)?['author'],
                                                       snapshot.data.values.elementAt(i)?['date'].toDate(),
                                                       snapshot.data.values.elementAt(i)?['uid'],
+                                                      snapshot.data.values.elementAt(i)?['joined'],
                                                     ),
                                                     if (i == snapshot.data.length - 1) SizedBox(height: 5),
                                                   ],
