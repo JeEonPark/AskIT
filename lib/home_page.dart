@@ -159,6 +159,8 @@ Future<Map> discussGetDocument() async {
 
 //#endregion
 
+void settingState;
+
 //#region 메인 homePage Class
 
 class _HomePageState extends State<HomePage> {

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SessionSettingPage extends StatefulWidget {
@@ -7,9 +8,21 @@ class SessionSettingPage extends StatefulWidget {
   State<SessionSettingPage> createState() => _SessionSettingPageState();
 }
 
+//글 지우기
+void deleteSession(String docId) async {
+  print(docId);
+  FirebaseFirestore.instance
+      .collection("DiscussPage_Sessions")
+      .doc(docId)
+      .delete()
+      .then((value) => print("success"))
+      .catchError((error) => print("Failed to add user: $error"));
+}
+
 class _SessionSettingPageState extends State<SessionSettingPage> {
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
     return SafeArea(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -108,7 +121,33 @@ class _SessionSettingPageState extends State<SessionSettingPage> {
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              content: Text("Do you want to delete Session?"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("No"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    deleteSession(args['docId']);
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("Yes, Delete"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                       label: Text(
                         "Delete session",
                         style: TextStyle(fontSize: 18, fontFamily: "Montserrat"),

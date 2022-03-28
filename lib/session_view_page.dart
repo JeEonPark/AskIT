@@ -303,6 +303,10 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                   onPressed: () {
                                     navigatorKey.currentState?.pushNamed('/session_setting_page', arguments: {
                                       "docId": args["docId"],
+                                      "title": args["title"],
+                                      "texts": args["texts"],
+                                      "author": args["author"],
+                                      "uid": args["uid"],
                                     });
                                   },
                                   iconSize: 35,
