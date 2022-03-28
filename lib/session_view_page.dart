@@ -332,7 +332,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
                               IconButton(
                                 padding: EdgeInsets.fromLTRB(10, 0, 20, 0),
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/participants_page',
+                                  navigatorKey.currentState?.pushNamed('/participants_page',
                                       arguments: {'docId': args['docId']});
                                 },
                                 iconSize: 35,
