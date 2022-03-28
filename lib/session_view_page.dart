@@ -270,63 +270,78 @@ class _SessionViewPageState extends State<SessionViewPage> {
           backgroundColor: const Color.fromARGB(255, 29, 30, 37),
           body: SafeArea(
             //앱 전체 감싸는 div
-            child: Column(
-              children: [
-                //상단바 div
-                Container(
-                  height: 70,
-                  child: Row(
-                    children: [
-                      //뒤로가기 버튼
-                      IconButton(
-                        padding: EdgeInsets.all(20),
-                        onPressed: () {
-                          liveJoined = false;
-                          Navigator.pop(context);
-                        },
-                        iconSize: 35,
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
+            child: FutureBuilder(
+                future: getDocument(args['docId']),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData == false) {
+                    return Text("Loading...");
+                  } else {
+                    return Column(
+                      children: [
+                        //상단바 div
+                        Container(
+                          height: 70,
+                          child: Row(
+                            children: [
+                              //뒤로가기 버튼
+                              IconButton(
+                                padding: EdgeInsets.all(20),
+                                onPressed: () {
+                                  liveJoined = false;
+                                  Navigator.pop(this.context);
+                                },
+                                iconSize: 35,
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Spacer(),
+                              if (snapshot.data.values.elementAt(0)['uid'] == FirebaseAuth.instance.currentUser?.uid)
+                                //setting 버튼
+                                IconButton(
+                                  onPressed: () {
+                                    navigatorKey.currentState?.pushNamed('/session_setting_page', arguments: {
+                                      "docId": args["docId"],
+                                    });
+                                  },
+                                  iconSize: 35,
+                                  icon: const Icon(
+                                    Icons.settings_outlined,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              //scratch pad 버튼
+                              IconButton(
+                                onPressed: () {
+                                  navigatorKey.currentState?.pushNamed('/scratch_pad', arguments: {
+                                    "docId": args["docId"],
+                                  });
+                                },
+                                iconSize: 35,
+                                icon: const Icon(
+                                  Icons.sticky_note_2_outlined,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              //참가자목록 버튼
+                              IconButton(
+                                padding: EdgeInsets.fromLTRB(10, 0, 20, 0),
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/participants_page',
+                                      arguments: {'docId': args['docId']});
+                                },
+                                iconSize: 35,
+                                icon: const Icon(
+                                  Icons.people_outline_rounded,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Spacer(),
-                      //scratch pad 버튼
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/scratch_pad', arguments: {
-                            "docId": args["docId"],
-                          });
-                        },
-                        iconSize: 35,
-                        icon: const Icon(
-                          Icons.sticky_note_2_outlined,
-                          color: Colors.white,
-                        ),
-                      ),
-                      //참가자목록 버튼
-                      IconButton(
-                        padding: EdgeInsets.fromLTRB(10, 0, 20, 0),
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/participants_page', arguments: {'docId': args['docId']});
-                        },
-                        iconSize: 35,
-                        icon: const Icon(
-                          Icons.people_outline_rounded,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: FutureBuilder(
-                      future: getDocument(args['docId']),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        if (snapshot.hasData == false) {
-                          return Text("Loading...");
-                        } else {
-                          return Column(
+                        Expanded(
+                          child: Column(
                             children: [
                               Expanded(
                                 child: Column(
@@ -1062,12 +1077,12 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                 ),
                               ),
                             ],
-                          );
-                        }
-                      }),
-                ),
-              ],
-            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                }),
           ),
         ),
       ),
