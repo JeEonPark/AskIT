@@ -1,5 +1,6 @@
 import 'package:ask_it/add_question_page.dart';
 import 'package:ask_it/ask_answer_method_page.dart';
+import 'package:ask_it/call_page.dart';
 import 'package:ask_it/login_page.dart';
 import 'package:ask_it/message_page.dart';
 import 'package:ask_it/others_message_page.dart';
@@ -67,6 +68,7 @@ void main() async {
         '/scratch_pad': (context) => ScratchPad(),
         '/session_setting_page': (context) => SessionSettingPage(),
         '/participants_page': (context) => ParticipantsPage(),
+        '/call_page': (context) => CallPage(),
       },
     ),
   );

@@ -185,6 +185,23 @@ class _MessagePageState extends State<MessagePage> {
                           fontSize: 25,
                         ),
                       ),
+                      Spacer(),
+                      //통화 버튼
+                      IconButton(
+                        padding: EdgeInsets.all(20),
+                        onPressed: () async {
+                          textFocus.unfocus();
+                          String username = await getUsernamebyUid(args["uid"]);
+                          Navigator.pushNamed(
+                            context,
+                            '/call_page',
+                            arguments: {"username": username},
+                          );
+                        },
+                        icon: Icon(Icons.call_outlined),
+                        color: Colors.white,
+                        iconSize: 35,
+                      ),
                     ],
                   ),
                 ),
