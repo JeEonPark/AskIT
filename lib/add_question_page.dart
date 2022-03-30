@@ -108,16 +108,14 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                   Expanded(
                     child: PageView.builder(
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: 3,
+                      itemCount: 2,
                       controller: controller,
                       itemBuilder: (context, i) {
                         if (i == 0) {
                           return addQuestionFirstPage();
                         } else if (i == 1) {
                           return addQuestionSecondPage();
-                        } else if (i == 2) {
-                          return addQuestionThirdPage();
-                        }
+                        } 
                         return Text("Loading");
                       },
                     ),
@@ -143,7 +141,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                           iconSize: 30,
                           onPressed: () {
                             print(controller.page);
-                            if (currentIndex == 1 || currentIndex == 2) {
+                            if (currentIndex == 1) {
                               controller.previousPage(
                                 duration: Duration(milliseconds: 200),
                                 curve: Curves.easeOut,
@@ -153,7 +151,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                           icon: Icon(
                             currentIndex == 0
                                 ? Icons.photo_camera_outlined
-                                : currentIndex == 1 || currentIndex == 2
+                                : currentIndex == 1
                                     ? Icons.arrow_back_ios_new_rounded
                                     : null,
                             color: Colors.white,
@@ -163,7 +161,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                         Row(
                           children: [
                             Text(
-                              currentIndex == 2 ? "Post" : "",
+                              currentIndex == 1 ? "Post" : "",
                               style: const TextStyle(
                                 fontFamily: "Montserrat",
                                 fontSize: 18,
@@ -176,7 +174,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                               splashRadius: 25,
                               iconSize: 30,
                               onPressed: () {
-                                if (currentIndex == 2) {
+                                if (currentIndex == 1) {
                                   writeQuestionDocument(titleInputController.text, textsInputController.text);
                                   Navigator.pop(context);
                                   currentIndex = 0;
@@ -192,7 +190,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                                 }
                               },
                               icon: Icon(
-                                currentIndex == 2 ? Icons.check_outlined : Icons.arrow_forward_ios_rounded,
+                                currentIndex == 1 ? Icons.check_outlined : Icons.arrow_forward_ios_rounded,
                                 color: Colors.white,
                               ),
                             ),
@@ -286,10 +284,6 @@ Widget addQuestionFirstPage() {
 }
 
 Widget addQuestionSecondPage() {
-  return (Text("Select Categories"));
-}
-
-Widget addQuestionThirdPage() {
   return (Column(
     children: [
       Text(

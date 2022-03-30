@@ -123,13 +123,11 @@ class _AddSessionPageState extends State<AddSessionPage> {
                   Expanded(
                     child: PageView.builder(
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: 2,
+                      itemCount: 1,
                       controller: controller,
                       itemBuilder: (context, i) {
                         if (i == 0) {
                           return addSessionFirstPage();
-                        } else if (i == 1) {
-                          return addSessionSecondPage();
                         }
                         return Text("Loading");
                       },
@@ -164,11 +162,7 @@ class _AddSessionPageState extends State<AddSessionPage> {
                             }
                           },
                           icon: Icon(
-                            currentIndex == 0
-                                ? Icons.photo_camera_outlined
-                                : currentIndex == 1
-                                    ? Icons.arrow_back_ios_new_rounded
-                                    : null,
+                            Icons.photo_camera_outlined,
                             color: Colors.white,
                           ),
                         ),
@@ -176,7 +170,7 @@ class _AddSessionPageState extends State<AddSessionPage> {
                         Row(
                           children: [
                             Text(
-                              currentIndex == 1 ? "Post" : "",
+                              "Post",
                               style: const TextStyle(
                                 fontFamily: "Montserrat",
                                 fontSize: 18,
@@ -189,7 +183,7 @@ class _AddSessionPageState extends State<AddSessionPage> {
                               splashRadius: 25,
                               iconSize: 30,
                               onPressed: () {
-                                if (currentIndex == 1) {
+                                if (dateTime_due_date != null) {
                                   DateTime date_final =
                                       dateTime_due_date!.add(Duration(hours: 23, minutes: 59, seconds: 59));
                                   Timestamp timestamp_due_date = Timestamp.fromDate(date_final);
@@ -202,34 +196,25 @@ class _AddSessionPageState extends State<AddSessionPage> {
                                   dateTime_due_date = null;
                                   time = "?";
                                 } else {
-                                  if (dateTime_due_date != null) {
-                                    controller.nextPage(
-                                      duration: Duration(milliseconds: 200),
-                                      curve: Curves.easeOut,
-                                    );
-                                    titleFocus.unfocus();
-                                    sessionFocus.unfocus();
-                                  } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          content: Text("You miss the set date!"),
-                                          actions: [
-                                            TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text("Close"))
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        content: Text("You miss the set date!"),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text("Close"))
+                                        ],
+                                      );
+                                    },
+                                  );
                                 }
                               },
                               icon: Icon(
-                                currentIndex == 1 ? Icons.check_outlined : Icons.arrow_forward_ios_rounded,
+                                currentIndex == 0 ? Icons.check_outlined : Icons.arrow_forward_ios_rounded,
                                 color: Colors.white,
                               ),
                             ),
