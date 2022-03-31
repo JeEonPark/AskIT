@@ -258,7 +258,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
         ),
       ),
     )..layout(
-        maxWidth: MediaQuery.of(context).size.width - 50,
+        maxWidth: MediaQuery.of(context).size.width - 44,
       );
     return GestureDetector(
       onTap: () {
@@ -361,13 +361,15 @@ class _SessionViewPageState extends State<SessionViewPage> {
                                                 //제목 박스
                                                 Container(
                                                   padding: EdgeInsets.fromLTRB(24, 0, 20, 0),
-                                                  child: Text(
-                                                    snapshot.data.values.elementAt(0)?['title'],
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 24,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontFamily: 'Montserrat',
+                                                  child: RichText(
+                                                    text: TextSpan(
+                                                      text: snapshot.data.values.elementAt(0)?['title'],
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 24,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontFamily: 'Montserrat',
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
