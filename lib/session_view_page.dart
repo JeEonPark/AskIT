@@ -258,7 +258,7 @@ class _SessionViewPageState extends State<SessionViewPage> {
         ),
       ),
     )..layout(
-        maxWidth: MediaQuery.of(context).size.width - 44,
+        maxWidth: MediaQuery.of(context).size.width - 50,
       );
     return GestureDetector(
       onTap: () {
@@ -332,8 +332,8 @@ class _SessionViewPageState extends State<SessionViewPage> {
                               IconButton(
                                 padding: EdgeInsets.fromLTRB(10, 0, 20, 0),
                                 onPressed: () {
-                                  navigatorKey.currentState?.pushNamed('/participants_page',
-                                      arguments: {'docId': args['docId']});
+                                  navigatorKey.currentState
+                                      ?.pushNamed('/participants_page', arguments: {'docId': args['docId']});
                                 },
                                 iconSize: 35,
                                 icon: const Icon(
