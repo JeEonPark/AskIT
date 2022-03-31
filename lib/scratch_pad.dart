@@ -123,7 +123,7 @@ class _ScratchPadState extends State<ScratchPad> {
                             ),
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: "Write your question here.",
+                              hintText: "Write you memo here.",
                               hintStyle: TextStyle(
                                 color: Color.fromARGB(140, 255, 255, 255),
                                 fontFamily: "Montserrat",
