@@ -125,7 +125,7 @@ class _ScratchPadState extends State<ScratchPad> {
                               border: InputBorder.none,
                               hintText: "Write you memo here.",
                               hintStyle: TextStyle(
-                                color: Color.fromARGB(140, 255, 255, 255),
+                                color: Color.fromARGB(139, 255, 255, 255),
                                 fontFamily: "Montserrat",
                               ),
                             ),
