@@ -12,7 +12,7 @@ A new Flutter project.
 ## How to run.
 
 You can run this project by
-# flutter run
+```flutter run```
 
 Or you can just download "AskIT.apk" file,
 and install your emulator or Android Phone.
